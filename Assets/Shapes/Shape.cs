@@ -17,7 +17,6 @@ public abstract class Shape : MonoBehaviour
     // Start is called before the first frame update
     protected virtual void Start()
     {
-        Debug.Log("Called parent start!");
         ShapeMesh = new Mesh();
         ShapeMeshFilter = GetComponent<MeshFilter>();
         ShapeMeshRenderer = GetComponent<MeshRenderer>();

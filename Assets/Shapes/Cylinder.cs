@@ -14,7 +14,7 @@ public class Cylinder : Shape
 
     public override void RequestMeshData()
     {
-        MeshInfo = MeshGenerator.GenerateMesh(Type, Details, SpawnPoint);
+        MeshInfo = MeshGenerator.GenerateMesh(Type, Details);
         UpdateMesh();
     }
 

@@ -51,6 +51,5 @@ public class ShapeSpawner : MonoBehaviour
         Shape NewShape = Instantiate(Shapes[index], SpawnPosition, Quaternion.identity);
         NewShape.transform.parent = ShapeHolder.transform;
         NewShape.SetInfo(Details, SpawnPosition);
-        Debug.Log("Spawned shape!");
     }
 }

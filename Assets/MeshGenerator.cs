@@ -6,17 +6,14 @@ public static class MeshGenerator
 {
     private static List<Vector3> Vertices = new List<Vector3>();
     private static List<int> Indices = new List<int>();
-    private static Vector3 SpawnPoint;
     private static float Size = 1;
 
     // Start is called before the first frame update
-    public static MeshStruct GenerateMesh(ShapeType Type, DetailLevel Details, Vector3 SpawnPoint_)
+    public static MeshStruct GenerateMesh(ShapeType Type, DetailLevel Details)
     {
         MeshStruct MeshInfo = new MeshStruct();
         Vertices.Clear();
         Indices.Clear();
-
-        SpawnPoint = SpawnPoint_;
 
         GenerateShape(Type, Details);
 
@@ -220,9 +217,9 @@ public static class MeshGenerator
 
     private static Vector3 ComputeCubeVertexPosition(int H, int L, int W, float Distance)
     {
-        float X = SpawnPoint.x - Size / 2.0f + W * Distance;
-        float Y = SpawnPoint.y - Size / 2.0f + H * Distance;
-        float Z = SpawnPoint.z - Size / 2.0f + L * Distance;
+        float X = - Size / 2.0f + W * Distance;
+        float Y = - Size / 2.0f + H * Distance;
+        float Z = - Size / 2.0f + L * Distance;
 
         Vector3 VertexPosition = new Vector3(X, Y, Z);
         return VertexPosition;
@@ -230,9 +227,9 @@ public static class MeshGenerator
 
     private static Vector3 ComputeCircleVertexPosition(int H, float Angle, float Distance, float Radius)
     {
-        float X = SpawnPoint.x + Radius * Mathf.Cos(Angle);
-        float Y = SpawnPoint.y - Size / 2.0f + H * Distance;
-        float Z = SpawnPoint.z + Radius * Mathf.Sin(Angle);
+        float X = Radius * Mathf.Cos(Angle);
+        float Y = - Size / 2.0f + H * Distance;
+        float Z = + Radius * Mathf.Sin(Angle);
 
         Vector3 VertexPosition = new Vector3(X, Y, Z);
         return VertexPosition;
@@ -240,9 +237,9 @@ public static class MeshGenerator
 
     private static Vector3 ComputeSphereVertexPosition(float Alpha, float Theta, float Radius)
     {
-        float X = SpawnPoint.x + Radius * Mathf.Sin(Theta) * Mathf.Cos(Alpha);
-        float Y = SpawnPoint.y + Radius * Mathf.Cos(Theta);
-        float Z = SpawnPoint.z + Radius * Mathf.Sin(Theta) * Mathf.Sin(Alpha);
+        float X = Radius * Mathf.Sin(Theta) * Mathf.Cos(Alpha);
+        float Y = Radius * Mathf.Cos(Theta);
+        float Z = Radius * Mathf.Sin(Theta) * Mathf.Sin(Alpha);
 
         Vector3 VertexPosition = new Vector3(X, Y, Z);
         return VertexPosition;
@@ -252,12 +249,12 @@ public static class MeshGenerator
     {
         if (Type == ShapeType.SPHERE)
         {
-            Vertices.Add(SpawnPoint + new Vector3(0.0f, -Size, 0.0f));
-            Vertices.Add(SpawnPoint + new Vector3(0.0f, Size, 0.0f));
+            Vertices.Add(new Vector3(0.0f, -Size, 0.0f));
+            Vertices.Add(new Vector3(0.0f, Size, 0.0f));
         } else
         {
-            Vertices.Add(SpawnPoint + new Vector3(0.0f, -Size / 2.0f, 0.0f));
-            Vertices.Add(SpawnPoint + new Vector3(0.0f, Size / 2.0f, 0.0f));
+            Vertices.Add(new Vector3(0.0f, -Size / 2.0f, 0.0f));
+            Vertices.Add(new Vector3(0.0f, Size / 2.0f, 0.0f));
         }
     }
 
