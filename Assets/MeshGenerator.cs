@@ -4,8 +4,8 @@ using UnityEngine;
 
 public static class MeshGenerator
 {
-    private static List<Vector3> vertices = new List<Vector3>();
-    private static List<int> indices = new List<int>();
+    private static List<Vector3> Vertices = new List<Vector3>();
+    private static List<int> Indices = new List<int>();
     private static Vector3 SpawnPoint;
     private static float Size = 1;
 
@@ -13,15 +13,15 @@ public static class MeshGenerator
     public static MeshStruct GenerateMesh(ShapeType Type, DetailLevel Details, Vector3 SpawnPoint_)
     {
         MeshStruct MeshInfo = new MeshStruct();
-        vertices.Clear();
-        indices.Clear();
+        Vertices.Clear();
+        Indices.Clear();
 
         SpawnPoint = SpawnPoint_;
 
         GenerateShape(Type, Details);
 
-        MeshInfo.VertexPosition = vertices.ToArray();
-        MeshInfo.indices = indices.ToArray();
+        MeshInfo.VertexPosition = Vertices.ToArray();
+        MeshInfo.indices = Indices.ToArray();
 
         return MeshInfo;
     }
@@ -66,7 +66,7 @@ public static class MeshGenerator
             Counter = 0;
             while (Angle < 2 * Mathf.PI)
             {
-                vertices.Add(ComputeCircleVertexPosition(HeightIndex, Angle, DistanceBetweenRings, Radius - (HeightIndex * DistanceBetweenRings)));
+                Vertices.Add(ComputeCircleVertexPosition(HeightIndex, Angle, DistanceBetweenRings, Radius - (HeightIndex * DistanceBetweenRings)));
                 Angle += AngleStep;
                 Counter++;
             }
@@ -94,7 +94,7 @@ public static class MeshGenerator
             Counter = 0;
             while (Angle < 2 * Mathf.PI)
             {
-                vertices.Add(ComputeCircleVertexPosition(HeightIndex, Angle, DistanceBetweenRings, Radius));
+                Vertices.Add(ComputeCircleVertexPosition(HeightIndex, Angle, DistanceBetweenRings, Radius));
                 Angle += AngleStep;
                 Counter++;
             }
@@ -126,7 +126,7 @@ public static class MeshGenerator
 
             while (Alpha < 2 * Mathf.PI)
             {
-                vertices.Add(ComputeSphereVertexPosition(Alpha, Theta, Radius));
+                Vertices.Add(ComputeSphereVertexPosition(Alpha, Theta, Radius));
                 Alpha += AngleAlphaStep;
                 Counter++;
             }
@@ -162,7 +162,7 @@ public static class MeshGenerator
             for (;WidthIndex < Width; WidthIndex++)
             {
                 Vector3 VertexPosition = ComputeCubeVertexPosition(HeightIndex, LengthIndex, WidthIndex, DistanceBetweenVerts);
-                vertices.Add(VertexPosition);
+                Vertices.Add(VertexPosition);
                 Counter++;
             }
             WidthIndex--;
@@ -170,7 +170,7 @@ public static class MeshGenerator
             for (LengthIndex = 1; LengthIndex < Length; LengthIndex++)
             {
                 Vector3 VertexPosition = ComputeCubeVertexPosition(HeightIndex, LengthIndex, WidthIndex, DistanceBetweenVerts);
-                vertices.Add(VertexPosition);
+                Vertices.Add(VertexPosition);
                 Counter++;
             }
             LengthIndex--;
@@ -178,7 +178,7 @@ public static class MeshGenerator
             for (WidthIndex = WidthIndex - 1; WidthIndex >= 0; WidthIndex--)
             {
                 Vector3 VertexPosition = ComputeCubeVertexPosition(HeightIndex, LengthIndex, WidthIndex, DistanceBetweenVerts);
-                vertices.Add(VertexPosition);
+                Vertices.Add(VertexPosition);
                 Counter++;
             }
             WidthIndex++;
@@ -186,7 +186,7 @@ public static class MeshGenerator
             for (LengthIndex = LengthIndex - 1; LengthIndex >= 1; LengthIndex--)
             {
                 Vector3 VertexPosition = ComputeCubeVertexPosition(HeightIndex, LengthIndex, WidthIndex, DistanceBetweenVerts);
-                vertices.Add(VertexPosition);
+                Vertices.Add(VertexPosition);
                 Counter++;
             }
         }
@@ -252,12 +252,12 @@ public static class MeshGenerator
     {
         if (Type == ShapeType.SPHERE)
         {
-            vertices.Add(SpawnPoint + new Vector3(0.0f, -Size, 0.0f));
-            vertices.Add(SpawnPoint + new Vector3(0.0f, Size, 0.0f));
+            Vertices.Add(SpawnPoint + new Vector3(0.0f, -Size, 0.0f));
+            Vertices.Add(SpawnPoint + new Vector3(0.0f, Size, 0.0f));
         } else
         {
-            vertices.Add(SpawnPoint + new Vector3(0.0f, -Size / 2.0f, 0.0f));
-            vertices.Add(SpawnPoint + new Vector3(0.0f, Size / 2.0f, 0.0f));
+            Vertices.Add(SpawnPoint + new Vector3(0.0f, -Size / 2.0f, 0.0f));
+            Vertices.Add(SpawnPoint + new Vector3(0.0f, Size / 2.0f, 0.0f));
         }
     }
 
@@ -274,26 +274,26 @@ public static class MeshGenerator
                 if (InnerIndex != PointsPerLayer - 1)
                 {
                     // First triangle
-                    indices.Add(HeightIndex * PointsPerLayer + InnerIndex);
-                    indices.Add((HeightIndex + 1) * PointsPerLayer + InnerIndex);
-                    indices.Add((HeightIndex + 1) * PointsPerLayer + InnerIndex + 1);
+                    Indices.Add(HeightIndex * PointsPerLayer + InnerIndex);
+                    Indices.Add((HeightIndex + 1) * PointsPerLayer + InnerIndex);
+                    Indices.Add((HeightIndex + 1) * PointsPerLayer + InnerIndex + 1);
 
                     // Second triangle
-                    indices.Add((HeightIndex + 1) * PointsPerLayer + InnerIndex + 1);
-                    indices.Add(HeightIndex * PointsPerLayer + InnerIndex + 1);
-                    indices.Add(HeightIndex * PointsPerLayer + InnerIndex);
+                    Indices.Add((HeightIndex + 1) * PointsPerLayer + InnerIndex + 1);
+                    Indices.Add(HeightIndex * PointsPerLayer + InnerIndex + 1);
+                    Indices.Add(HeightIndex * PointsPerLayer + InnerIndex);
                 }
                 else
                 {
                     // First triangle
-                    indices.Add(HeightIndex * PointsPerLayer + InnerIndex);
-                    indices.Add((HeightIndex + 1) * PointsPerLayer + InnerIndex);
-                    indices.Add((HeightIndex + 1) * PointsPerLayer);
+                    Indices.Add(HeightIndex * PointsPerLayer + InnerIndex);
+                    Indices.Add((HeightIndex + 1) * PointsPerLayer + InnerIndex);
+                    Indices.Add((HeightIndex + 1) * PointsPerLayer);
 
                     // Second triangle
-                    indices.Add((HeightIndex + 1) * PointsPerLayer);
-                    indices.Add(HeightIndex * PointsPerLayer);
-                    indices.Add(HeightIndex * PointsPerLayer + InnerIndex);
+                    Indices.Add((HeightIndex + 1) * PointsPerLayer);
+                    Indices.Add(HeightIndex * PointsPerLayer);
+                    Indices.Add(HeightIndex * PointsPerLayer + InnerIndex);
                 }
             }
         }
@@ -301,25 +301,25 @@ public static class MeshGenerator
         // Draw bottom panel
         for (int InnerIndex = 0; InnerIndex < PointsPerLayer - 1; InnerIndex++)
         {
-            indices.Add(InnerIndex + 1);
-            indices.Add((LayerLimit + 1) * PointsPerLayer);
-            indices.Add(InnerIndex);
+            Indices.Add(InnerIndex + 1);
+            Indices.Add((LayerLimit + 1) * PointsPerLayer);
+            Indices.Add(InnerIndex);
         }
 
-        indices.Add(0);
-        indices.Add((LayerLimit + 1) * PointsPerLayer);
-        indices.Add(PointsPerLayer - 1);
+        Indices.Add(0);
+        Indices.Add((LayerLimit + 1) * PointsPerLayer);
+        Indices.Add(PointsPerLayer - 1);
 
         // Draw top panel
         for (int InnerIndex = 0; InnerIndex < PointsPerLayer - 1; InnerIndex++)
         {
-            indices.Add(LayerLimit * PointsPerLayer + InnerIndex);
-            indices.Add((LayerLimit + 1) * PointsPerLayer + 1);
-            indices.Add(LayerLimit * PointsPerLayer + InnerIndex + 1);
+            Indices.Add(LayerLimit * PointsPerLayer + InnerIndex);
+            Indices.Add((LayerLimit + 1) * PointsPerLayer + 1);
+            Indices.Add(LayerLimit * PointsPerLayer + InnerIndex + 1);
         }
 
-        indices.Add((LayerLimit + 1) * PointsPerLayer - 1);
-        indices.Add((LayerLimit + 1) * PointsPerLayer + 1);
-        indices.Add(LayerLimit * PointsPerLayer);
+        Indices.Add((LayerLimit + 1) * PointsPerLayer - 1);
+        Indices.Add((LayerLimit + 1) * PointsPerLayer + 1);
+        Indices.Add(LayerLimit * PointsPerLayer);
     }
 }

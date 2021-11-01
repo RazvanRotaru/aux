@@ -4,7 +4,7 @@ using UnityEngine;
 
 [RequireComponent(typeof(MeshRenderer))]
 [RequireComponent(typeof(MeshFilter))]
-public class Shape : MonoBehaviour
+public abstract class Shape : MonoBehaviour
 {
     protected Mesh ShapeMesh;
     protected MeshFilter ShapeMeshFilter;
@@ -23,10 +23,7 @@ public class Shape : MonoBehaviour
         ShapeMeshRenderer = GetComponent<MeshRenderer>();
     }
 
-    public virtual void RequestMeshData()
-    {
-
-    }
+    public abstract void RequestMeshData();
 
     public void SetInfo(DetailLevel Details_, Vector3 SpawnPoint_)
     {
