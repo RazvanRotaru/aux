@@ -15,7 +15,7 @@ public class CubeCollider : MonoBehaviour, ICollidable
 
 
     // TODO(): Must optimize!!!!!
-    public Vector3[] U => new Vector3[] {transform.right, transform.up, transform.forward};
+    public Vector3[] U => new Vector3[] {-transform.right, -transform.up, -transform.forward};
 
     // TODO(): Must optimize!!!!!
     public List<float> HalfWidth

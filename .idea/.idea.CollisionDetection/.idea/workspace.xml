@@ -2,23 +2,11 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="9c34cb9f-7a42-428a-83f9-003d8d59d19f" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/Assets/CollideManager.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/CollideManager.cs.meta" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/CubeCollider.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/CubeCollider.cs.meta" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/ICollidable.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/ICollidable.cs.meta" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Materials.meta" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Materials/Blue.mat" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Materials/Blue.mat.meta" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Materials/Red.mat" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Materials/Red.mat.meta" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Scenes/CollisionTests.unity" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Scenes/CollisionTests.unity.meta" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Scripts.meta" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Scripts/Collisions.meta" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Prefabs/CubeMesh.prefab" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Prefabs/CubeMesh.prefab" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Shapes/Cube.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Shapes/Cube.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.CollisionDetection/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.CollisionDetection/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/CollideManager.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/CollideManager.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/ContactPoint.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/ContactPoint.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/CubeCollider.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/CubeCollider.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scenes/CollisionTests.unity" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scenes/CollisionTests.unity" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -88,7 +76,7 @@
       <workItem from="1635799716505" duration="34000" />
       <workItem from="1635799830733" duration="1625000" />
       <workItem from="1635801873288" duration="794000" />
-      <workItem from="1636890552043" duration="6151000" />
+      <workItem from="1636890552043" duration="16723000" />
     </task>
     <servers />
   </component>
