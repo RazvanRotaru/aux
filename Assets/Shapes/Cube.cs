@@ -5,9 +5,9 @@ using UnityEngine;
 public class Cube : Shape
 {
     // Start is called before the first frame update
-    protected override void Start()
+    protected override void Reset()
     {
-        base.Start();
+        base.Reset();
         Type = ShapeType.CUBE;
         RequestMeshData();
     }

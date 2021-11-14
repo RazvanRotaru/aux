@@ -15,7 +15,7 @@ public abstract class Shape : MonoBehaviour
     protected DetailLevel Details;
 
     // Start is called before the first frame update
-    protected virtual void Start()
+    protected virtual void Reset()
     {
         ShapeMesh = new Mesh();
         ShapeMeshFilter = GetComponent<MeshFilter>();

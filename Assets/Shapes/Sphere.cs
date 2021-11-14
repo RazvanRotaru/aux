@@ -5,9 +5,9 @@ using UnityEngine;
 public class Sphere : Shape
 {
     // Start is called before the first frame update
-    override protected void Start()
+    protected override void Reset()
     {
-        base.Start();
+        base.Reset();
         Type = ShapeType.SPHERE;
         RequestMeshData();
     }
