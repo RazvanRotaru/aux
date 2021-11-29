@@ -2,11 +2,105 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="9c34cb9f-7a42-428a-83f9-003d8d59d19f" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/Assets/Resources.meta" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Resources/Materials.meta" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Resources/Materials/Blue.mat" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Resources/Materials/Blue.mat.meta" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Resources/Materials/Red.mat" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Resources/Materials/Red.mat.meta" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Resources/Materials/Yellow.mat" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Resources/Materials/Yellow.mat.meta" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Resources/Prefabs.meta" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Resources/Prefabs/ConeMesh.prefab" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Resources/Prefabs/ConeMesh.prefab.meta" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Resources/Prefabs/CubeMesh.prefab" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Resources/Prefabs/CubeMesh.prefab.meta" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Resources/Prefabs/CylinderMesh.prefab" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Resources/Prefabs/CylinderMesh.prefab.meta" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Resources/Prefabs/DebugPoint.prefab" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Resources/Prefabs/DebugPoint.prefab.meta" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Resources/Prefabs/SphereMesh.prefab" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Resources/Prefabs/SphereMesh.prefab.meta" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Scripts/CollideManager.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Scripts/CollideManager.cs.meta" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Scripts/ContactPoint.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Scripts/ContactPoint.cs.meta" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Scripts/CubeCollider.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Scripts/CubeCollider.cs.meta" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Scripts/DetailLevel.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Scripts/DetailLevel.cs.meta" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Scripts/ICollidable.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Scripts/ICollidable.cs.meta" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Scripts/MeshGenerator.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Scripts/MeshGenerator.cs.meta" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Scripts/MeshStruct.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Scripts/MeshStruct.cs.meta" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Scripts/ShapeSpawner.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Scripts/ShapeSpawner.cs.meta" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Scripts/ShapeType.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Scripts/ShapeType.cs.meta" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Scripts/Shapes.meta" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Scripts/Shapes/Cone.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Scripts/Shapes/Cone.cs.meta" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Scripts/Shapes/Cube.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Scripts/Shapes/Cube.cs.meta" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Scripts/Shapes/Cylinder.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Scripts/Shapes/Cylinder.cs.meta" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Scripts/Shapes/Face.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Scripts/Shapes/Face.cs.meta" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Scripts/Shapes/HalfEdge.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Scripts/Shapes/HalfEdge.cs.meta" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Scripts/Shapes/Shape.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Scripts/Shapes/Shape.cs.meta" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Scripts/Shapes/Sphere.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Scripts/Shapes/Sphere.cs.meta" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Scripts/Shapes/Vertex.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Scripts/Shapes/Vertex.cs.meta" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.CollisionDetection/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.CollisionDetection/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/CollideManager.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/CollideManager.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/ContactPoint.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/ContactPoint.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/CubeCollider.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/CubeCollider.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/CollideManager.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/CollideManager.cs.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/ContactPoint.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/ContactPoint.cs.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/CubeCollider.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/CubeCollider.cs.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/DetailLevel.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/DetailLevel.cs.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/ICollidable.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/ICollidable.cs.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Materials.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Materials/Blue.mat" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Materials/Blue.mat.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Materials/Red.mat" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Materials/Red.mat.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/MeshGenerator.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/MeshGenerator.cs.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/MeshStruct.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/MeshStruct.cs.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Prefabs.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Prefabs/ConeMesh.prefab" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Prefabs/ConeMesh.prefab.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Prefabs/CubeMesh.prefab" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Prefabs/CubeMesh.prefab.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Prefabs/CylinderMesh.prefab" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Prefabs/CylinderMesh.prefab.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Prefabs/SphereMesh.prefab" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Prefabs/SphereMesh.prefab.meta" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/Assets/Scenes/CollisionTests.unity" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scenes/CollisionTests.unity" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/ShapeSpawner.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/ShapeSpawner.cs.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/ShapeType.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/ShapeType.cs.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Shapes.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Shapes/Cone.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Shapes/Cone.cs.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Shapes/Cube.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Shapes/Cube.cs.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Shapes/Cylinder.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Shapes/Cylinder.cs.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Shapes/Shape.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Shapes/Shape.cs.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Shapes/Sphere.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Shapes/Sphere.cs.meta" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -19,8 +113,8 @@
   <component name="HighlightingSettingsPerFile">
     <setting file="file://$PROJECT_DIR$/Library/PackageCache/com.unity.ide.visualstudio@2.0.11/Editor/ProjectGeneration/ProjectGeneration.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/fd80350a03fb4f81873aacb5119f49359580/8a/d6e6792f/Matrix4x4.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/ad3eaa0878d94cbe8e45f9c494d7164713bc00/cb/a0fb97a2/Mesh.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/ad3eaa0878d94cbe8e45f9c494d7164713bc00/6a/d7970538/Vector3.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/Assets/CubeCollider.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/ad3eaa0878d94cbe8e45f9c494d7164713bc00/fb/88fa13ab/MonoBehaviour.cs" root0="SKIP_HIGHLIGHTING" />
   </component>
   <component name="ProjectId" id="20KiU5iuUEz9mmUiHZJ0sgHVHyl" />
@@ -76,7 +170,8 @@
       <workItem from="1635799716505" duration="34000" />
       <workItem from="1635799830733" duration="1625000" />
       <workItem from="1635801873288" duration="794000" />
-      <workItem from="1636890552043" duration="16723000" />
+      <workItem from="1636890552043" duration="17018000" />
+      <workItem from="1638139868303" duration="10777000" />
     </task>
     <servers />
   </component>

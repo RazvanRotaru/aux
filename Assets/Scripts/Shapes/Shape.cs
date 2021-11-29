@@ -33,8 +33,12 @@ public abstract class Shape : MonoBehaviour
     protected void UpdateMesh()
     {
         ShapeMesh.Clear();
+
         ShapeMesh.vertices = MeshInfo.VertexPosition;
         ShapeMesh.triangles = MeshInfo.indices;
+        ShapeMesh.RecalculateNormals();
+        ShapeMesh.Optimize();
+
         ShapeMeshFilter.mesh = ShapeMesh;
     }
 }

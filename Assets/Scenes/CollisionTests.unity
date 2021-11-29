@@ -1285,6 +1285,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 597eb4b9a4ba4ac9ab1854cc94b4fcfa, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  debugPoint: {fileID: 4109286027798459965, guid: 86df03f312bb8a54eba8ac84ea14a683,
+    type: 3}
   cubeColliders: []
 --- !u!4 &2097864874
 Transform:
