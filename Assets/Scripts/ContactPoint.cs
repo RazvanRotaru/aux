@@ -11,6 +11,10 @@ public struct ContactPoint
         this.normal = normal;
         this.penetration = penetration;
         this.position = position;
+
+#if UNITY_EDITOR
+        Object.Instantiate(CollideManager.Instance.DebugPoint, position, Quaternion.identity);
+#endif
     }
 
     public override string ToString()

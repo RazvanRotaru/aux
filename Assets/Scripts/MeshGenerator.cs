@@ -1,5 +1,6 @@
-using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
+using Shapes;
 using UnityEngine;
 
 public static class MeshGenerator
@@ -19,6 +20,9 @@ public static class MeshGenerator
 
         MeshInfo.VertexPosition = Vertices.ToArray();
         MeshInfo.indices = Indices.ToArray();
+
+        var halfEdges = GenerateHalfEdges();
+        MeshInfo.HalfEdges = halfEdges;
 
         return MeshInfo;
     }
@@ -51,7 +55,7 @@ public static class MeshGenerator
     private static void GenerateCone(DetailLevel Details)
     {
         float DistanceBetweenRings = DistanceBetweenElements(Details);
-        int Height = (int)(1.0f / DistanceBetweenRings) + 1;
+        int Height = (int) (1.0f / DistanceBetweenRings) + 1;
         float Angle = 0;
         float AngleStep = Mathf.PI / (Height * 2);
         int Counter = 0;
@@ -63,14 +67,15 @@ public static class MeshGenerator
             Counter = 0;
             while (Angle < 2 * Mathf.PI)
             {
-                Vertices.Add(ComputeCircleVertexPosition(HeightIndex, Angle, DistanceBetweenRings, Radius - (HeightIndex * DistanceBetweenRings)));
+                Vertices.Add(ComputeCircleVertexPosition(HeightIndex, Angle, DistanceBetweenRings,
+                    Radius - (HeightIndex * DistanceBetweenRings)));
                 Angle += AngleStep;
                 Counter++;
             }
         }
 
         AddCenterPoints(ShapeType.CONE);
-        
+
         int PointsPerRing = Counter;
 
         GenerateTriangles(Height, PointsPerRing, ShapeType.CONE);
@@ -79,7 +84,7 @@ public static class MeshGenerator
     private static void GenerateCylinder(DetailLevel Details)
     {
         float DistanceBetweenRings = DistanceBetweenElements(Details);
-        int Height = (int)(1.0f / DistanceBetweenRings) + 1;
+        int Height = (int) (1.0f / DistanceBetweenRings) + 1;
         float Angle = 0;
         float AngleStep = Mathf.PI / (Height * 2);
         int Counter = 0;
@@ -107,7 +112,7 @@ public static class MeshGenerator
     private static void GenerateSphere(DetailLevel Details)
     {
         float DistanceBetweenRings = DistanceBetweenElements(Details);
-        int Height = (int)(1.0f / DistanceBetweenRings) + 1;
+        int Height = (int) (1.0f / DistanceBetweenRings) + 1;
         float Alpha = 0;
         float Theta = Mathf.PI - 0.05f * Mathf.PI;
         float AngleAlphaStep = Mathf.PI / (Height * 2);
@@ -146,7 +151,7 @@ public static class MeshGenerator
         int Height;
         int Width;
         int Length;
-        Length = Height = Width = (int)(1.0f / DistanceBetweenVerts) + 1;
+        Length = Height = Width = (int) (1.0f / DistanceBetweenVerts) + 1;
 
         int Counter = 0;
         // Generate the side planes first
@@ -156,33 +161,40 @@ public static class MeshGenerator
             int LengthIndex = 0;
             Counter = 0;
 
-            for (;WidthIndex < Width; WidthIndex++)
+            for (; WidthIndex < Width; WidthIndex++)
             {
-                Vector3 VertexPosition = ComputeCubeVertexPosition(HeightIndex, LengthIndex, WidthIndex, DistanceBetweenVerts);
+                Vector3 VertexPosition =
+                    ComputeCubeVertexPosition(HeightIndex, LengthIndex, WidthIndex, DistanceBetweenVerts);
                 Vertices.Add(VertexPosition);
                 Counter++;
             }
+
             WidthIndex--;
 
             for (LengthIndex = 1; LengthIndex < Length; LengthIndex++)
             {
-                Vector3 VertexPosition = ComputeCubeVertexPosition(HeightIndex, LengthIndex, WidthIndex, DistanceBetweenVerts);
+                Vector3 VertexPosition =
+                    ComputeCubeVertexPosition(HeightIndex, LengthIndex, WidthIndex, DistanceBetweenVerts);
                 Vertices.Add(VertexPosition);
                 Counter++;
             }
+
             LengthIndex--;
 
             for (WidthIndex = WidthIndex - 1; WidthIndex >= 0; WidthIndex--)
             {
-                Vector3 VertexPosition = ComputeCubeVertexPosition(HeightIndex, LengthIndex, WidthIndex, DistanceBetweenVerts);
+                Vector3 VertexPosition =
+                    ComputeCubeVertexPosition(HeightIndex, LengthIndex, WidthIndex, DistanceBetweenVerts);
                 Vertices.Add(VertexPosition);
                 Counter++;
             }
+
             WidthIndex++;
 
             for (LengthIndex = LengthIndex - 1; LengthIndex >= 1; LengthIndex--)
             {
-                Vector3 VertexPosition = ComputeCubeVertexPosition(HeightIndex, LengthIndex, WidthIndex, DistanceBetweenVerts);
+                Vector3 VertexPosition =
+                    ComputeCubeVertexPosition(HeightIndex, LengthIndex, WidthIndex, DistanceBetweenVerts);
                 Vertices.Add(VertexPosition);
                 Counter++;
             }
@@ -217,9 +229,9 @@ public static class MeshGenerator
 
     private static Vector3 ComputeCubeVertexPosition(int H, int L, int W, float Distance)
     {
-        float X = - Size / 2.0f + W * Distance;
-        float Y = - Size / 2.0f + H * Distance;
-        float Z = - Size / 2.0f + L * Distance;
+        float X = -Size / 2.0f + W * Distance;
+        float Y = -Size / 2.0f + H * Distance;
+        float Z = -Size / 2.0f + L * Distance;
 
         Vector3 VertexPosition = new Vector3(X, Y, Z);
         return VertexPosition;
@@ -228,8 +240,8 @@ public static class MeshGenerator
     private static Vector3 ComputeCircleVertexPosition(int H, float Angle, float Distance, float Radius)
     {
         float X = Radius * Mathf.Cos(Angle);
-        float Y = - Size / 2.0f + H * Distance;
-        float Z = + Radius * Mathf.Sin(Angle);
+        float Y = -Size / 2.0f + H * Distance;
+        float Z = +Radius * Mathf.Sin(Angle);
 
         Vector3 VertexPosition = new Vector3(X, Y, Z);
         return VertexPosition;
@@ -251,7 +263,8 @@ public static class MeshGenerator
         {
             Vertices.Add(new Vector3(0.0f, -Size, 0.0f));
             Vertices.Add(new Vector3(0.0f, Size, 0.0f));
-        } else
+        }
+        else
         {
             Vertices.Add(new Vector3(0.0f, -Size / 2.0f, 0.0f));
             Vertices.Add(new Vector3(0.0f, Size / 2.0f, 0.0f));
@@ -318,5 +331,40 @@ public static class MeshGenerator
         Indices.Add((LayerLimit + 1) * PointsPerLayer - 1);
         Indices.Add((LayerLimit + 1) * PointsPerLayer + 1);
         Indices.Add(LayerLimit * PointsPerLayer);
+    }
+
+    private static List<HalfEdge> GenerateHalfEdges()
+    {
+        var halfEdges = new Dictionary<(int, int), HalfEdge>();
+        var edges = new List<(int u, int v)> {(0, 1), (1, 2), (2, 0)};
+
+        var size = Indices.Count;
+        for (var i = 0; i < size; i += 3)
+        {
+            var A = Vertices[i];
+            var B = Vertices[i + 1];
+            var C = Vertices[i + 2];
+
+            foreach (var edge in edges)
+            {
+                var halfEdge = new HalfEdge();
+                halfEdges[edge] = halfEdge;
+                halfEdges[edge].Face = new Face(halfEdge, A, B, C);
+            }
+
+            foreach (var edge in edges)
+            {
+                halfEdges[edge].Next = halfEdges[((edge.u + 1) % 3, (edge.v + 1) % 3)];
+                var twinEdge = (edge.v, edge.u);
+
+                if (halfEdges.ContainsKey(twinEdge))
+                {
+                    halfEdges[edge].Twin = halfEdges[twinEdge];
+                    halfEdges[twinEdge].Twin = halfEdges[edge];
+                }
+            }
+        }
+
+        return halfEdges.Values.ToList();
     }
 }

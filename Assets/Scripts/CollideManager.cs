@@ -1,12 +1,35 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using UnityEditor.iOS;
 using UnityEngine;
 using UnityEngine.Serialization;
 
 public class CollideManager : MonoBehaviour
 {
     private const float Eps = 10e-3f;
+    [SerializeField] private GameObject debugPoint;
+
+    public static CollideManager Instance { get; private set; }
+    public GameObject DebugPoint => debugPoint;
+
+    private void Awake()
+    {
+        if (Instance != null && Instance != this)
+        {
+            Destroy(gameObject);
+            return;
+        }
+
+        Instance = this;
+        DontDestroyOnLoad(gameObject);
+    }
+
+    private void Reset()
+    {
+        debugPoint = Resources.Load("Prefabs/DebugPoint.prefab") as GameObject;
+        print(debugPoint);
+    }
 
     public static bool IsColliding(ICollidable a, ICollidable b)
     {
