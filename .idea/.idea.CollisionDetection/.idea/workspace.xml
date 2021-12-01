@@ -3,23 +3,10 @@
   <component name="ChangeListManager">
     <list default="true" id="9c34cb9f-7a42-428a-83f9-003d8d59d19f" name="Changes" comment="move stuff around">
       <change beforePath="$PROJECT_DIR$/.idea/.idea.CollisionDetection/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.CollisionDetection/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Resources/Prefabs/ConeMesh.prefab" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Resources/Prefabs/ConeMesh.prefab" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Resources/Prefabs/CubeMesh.prefab" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Resources/Prefabs/CubeMesh.prefab" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Resources/Prefabs/CylinderMesh.prefab" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Resources/Prefabs/CylinderMesh.prefab" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Assets/Scenes/CollisionTests.unity" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scenes/CollisionTests.unity" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scripts/CollideManager.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/CollideManager.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scripts/ContactPoint.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/ContactPoint.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Assets/Scripts/CubeCollider.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/CubeCollider.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scripts/MeshGenerator.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/MeshGenerator.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scripts/MeshStruct.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/MeshStruct.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scripts/Shapes/Cone.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/Shapes/Cone.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scripts/Shapes/Cube.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/Shapes/Cube.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Assets/Scripts/Shapes/Cylinder.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/Shapes/Cylinder.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scripts/Shapes/Face.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/Shapes/Face.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scripts/Shapes/HalfEdge.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/Shapes/HalfEdge.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Assets/Scripts/Shapes/Shape.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/Shapes/Shape.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scripts/Shapes/Sphere.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/Shapes/Sphere.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scripts/Shapes/Vertex.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/Shapes/Vertex.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -100,7 +87,7 @@
       <workItem from="1635799830733" duration="1625000" />
       <workItem from="1635801873288" duration="794000" />
       <workItem from="1636890552043" duration="17018000" />
-      <workItem from="1638139868303" duration="40586000" />
+      <workItem from="1638139868303" duration="42144000" />
     </task>
     <task id="LOCAL-00001" summary="add faulty collision detection system&#10;add half-edge structure">
       <created>1638222374215</created>
@@ -213,27 +200,14 @@
           <option name="timeStamp" value="19" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DotNet Breakpoints">
-          <url>file://$PROJECT_DIR$/Assets/Scripts/CollideManager.cs</url>
-          <line>364</line>
-          <properties documentPath="D:\Projects\CollisionDetection\Assets\Scripts\CollideManager.cs" initialLine="364" containingFunctionPresentation="method 'QueryFaceDirection'">
-            <startOffsets>
-              <option value="12179" />
-            </startOffsets>
-            <endOffsets>
-              <option value="12236" />
-            </endOffsets>
-          </properties>
-          <option name="timeStamp" value="22" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="DotNet Breakpoints">
           <url>file://$PROJECT_DIR$/Assets/Scripts/Shapes/Shape.cs</url>
           <line>68</line>
           <properties documentPath="D:\Projects\CollisionDetection\Assets\Scripts\Shapes\Shape.cs" initialLine="68" containingFunctionPresentation="method 'GetSupportPoint'">
             <startOffsets>
-              <option value="1960" />
+              <option value="1951" />
             </startOffsets>
             <endOffsets>
-              <option value="2010" />
+              <option value="2001" />
             </endOffsets>
           </properties>
           <option name="timeStamp" value="23" />
@@ -243,10 +217,10 @@
           <line>50</line>
           <properties documentPath="D:\Projects\CollisionDetection\Assets\Scripts\Shapes\Shape.cs" initialLine="50" containingFunctionPresentation="method 'GetSupportPoint'">
             <startOffsets>
-              <option value="1445" />
+              <option value="1436" />
             </startOffsets>
             <endOffsets>
-              <option value="1480" />
+              <option value="1471" />
             </endOffsets>
           </properties>
           <option name="timeStamp" value="24" />

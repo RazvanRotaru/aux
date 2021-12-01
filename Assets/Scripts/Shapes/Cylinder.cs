@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -10,5 +11,10 @@ public class Cylinder : Shape
         base.Reset();
         Type = ShapeType.CYLINDER;
         RequestMeshData();
+    }
+
+    private void Start()
+    {
+        Reset();
     }
 }

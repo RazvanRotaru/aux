@@ -6,7 +6,7 @@ public class CubeCollider : MonoBehaviour, ICollidable
 {
     [SerializeField] private MeshRenderer _meshRenderer;
     [SerializeField] private MeshFilter _meshFilter;
-    [SerializeField] private Cube _shape;
+    [SerializeField] private Shape _shape;
 
     [SerializeField] private Material _red;
     [SerializeField] private Material _blue;
@@ -36,7 +36,7 @@ public class CubeCollider : MonoBehaviour, ICollidable
     {
         _meshRenderer = GetComponent<MeshRenderer>();
         _meshFilter = GetComponent<MeshFilter>();
-        _shape = GetComponent<Cube>();
+        _shape = GetComponent<Shape>();
     }
 
     void Update()

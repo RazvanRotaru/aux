@@ -6,7 +6,7 @@ using UnityEngine;
 
 [RequireComponent(typeof(MeshRenderer))]
 [RequireComponent(typeof(MeshFilter))]
-public abstract class Shape : MonoBehaviour
+public class Shape : MonoBehaviour
 {
     protected Mesh ShapeMesh;
     protected MeshFilter ShapeMeshFilter;
@@ -86,10 +86,10 @@ public abstract class Shape : MonoBehaviour
         var halfEdges = new Dictionary<(int, int), HalfEdge>();
         var edgeIndices = new List<(int u, int v)> {(0, 1), (1, 2), (2, 0)};
 
-        var _indices = MeshInfo.Indices.ToList();
+        var _indices = MeshInfo.Indices;
         var _vertices = MeshInfo.VertexPosition;
 
-        var size = _indices.Count;
+        var size = _indices.Length;
         for (var i = 0; i < size; i += 3)
         {
             var A = _indices[i];
