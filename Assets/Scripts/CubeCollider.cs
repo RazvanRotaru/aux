@@ -6,10 +6,13 @@ public class CubeCollider : MonoBehaviour, ICollidable
 {
     [SerializeField] private MeshRenderer _meshRenderer;
     [SerializeField] private MeshFilter _meshFilter;
+    [SerializeField] private Cube _shape;
 
     [SerializeField] private Material _red;
     [SerializeField] private Material _blue;
 
+
+    public Shape Shape => _shape;
 
     public Vector3 Center => transform.position;
 
@@ -29,10 +32,11 @@ public class CubeCollider : MonoBehaviour, ICollidable
         }
     }
 
-    void Awake()
+    private void Awake()
     {
         _meshRenderer = GetComponent<MeshRenderer>();
         _meshFilter = GetComponent<MeshFilter>();
+        _shape = GetComponent<Cube>();
     }
 
     void Update()

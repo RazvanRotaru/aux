@@ -13,7 +13,8 @@ public struct ContactPoint
         this.position = position;
 
 #if UNITY_EDITOR
-        Object.Instantiate(CollideManager.Instance.DebugPoint, position, Quaternion.identity);
+        var cp = Object.Instantiate(CollideManager.Instance.DebugPoint, position, Quaternion.identity);
+        Object.Destroy(cp, 0.1f);
 #endif
     }
 

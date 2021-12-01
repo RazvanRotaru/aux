@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Shapes;
 using UnityEngine;
 
+[System.Serializable]
 public struct MeshStruct
 {
     public Vector3[] VertexPosition;
@@ -10,5 +11,5 @@ public struct MeshStruct
     public Vector3[] VertexNormals;
     public List<HalfEdge> HalfEdges;
 
-    public int[] indices;
+    public int[] Indices;
 }

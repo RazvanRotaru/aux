@@ -1,9 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using UnityEditor.iOS;
+using Shapes;
 using UnityEngine;
-using UnityEngine.Serialization;
+using Object = UnityEngine.Object;
 
 public class CollideManager : MonoBehaviour
 {
@@ -258,10 +258,137 @@ public class CollideManager : MonoBehaviour
             // So we have a point and a direction for the colliding edges.
             // We need to find out point of closest approach of the two
             // line-segments.
-            var vertex = EdgePoint(PA, ra, a.HalfWidth[aAxis], PB, rb, b.HalfWidth[bAxis]);
-            return new ContactPoint(L, penetration, vertex);
+            var vertex = -EdgePoint(PA, ra, a.HalfWidth[aAxis], PB, rb, b.HalfWidth[bAxis]);
+            return new ContactPoint(L, -penetration, vertex);
         }
     }
+
+    #region GaussMap Optimization
+
+    private static bool BuildMinkowskiFace(HalfEdge halfEdgeA, HalfEdge halfEdgeB)
+    {
+        var normalA1 = halfEdgeA.Face.Normal;
+        var normalA2 = halfEdgeA.Twin.Face.Normal;
+        var edgeA = halfEdgeA.Edge;
+
+        var normalB1 = halfEdgeB.Face.Normal;
+        var normalB2 = halfEdgeB.Twin.Face.Normal;
+        var edgeB = halfEdgeB.Edge;
+
+        return IsMinkowskiFace(normalA1, normalA2, -normalB1, -normalB2, edgeA, -edgeB);
+    }
+
+    private static bool IsMinkowskiFace(Vector3 a, Vector3 b, Vector3 c, Vector3 d, Vector3 ab, Vector3 dc)
+    {
+        var bxa = ab; //Vector3.Cross(b, a); //ab
+        var dxc = dc; //Vector3.Cross(d, c); //dc
+
+        var cba = Vector3.Dot(c, bxa);
+        var dba = Vector3.Dot(d, bxa);
+        var adc = Vector3.Dot(a, dxc);
+        var bdc = Vector3.Dot(b, dxc);
+
+        return cba * dba < 0 && adc * bdc < 0 && cba * bdc > 0;
+    }
+
+    private static float Distance(HalfEdge halfEdgeA, HalfEdge halfEdgeB, CubeCollider cubeA)
+    {
+        var edgeA = halfEdgeA.Edge.normalized;
+        var pointA = halfEdgeA.Vertex.Point;
+
+        var edgeB = halfEdgeB.Edge.normalized;
+        var pointB = halfEdgeB.Vertex.Point;
+
+        if (Math.Abs(Mathf.Abs(Vector3.Dot(edgeA, edgeB)) - 1f) < 1e-3f)
+        {
+            return float.MinValue;
+        }
+
+        var normal = Vector3.Cross(edgeA, edgeB).normalized;
+        if (Vector3.Dot(normal, pointA - cubeA.Center) > 0f)
+        {
+            normal = -normal;
+        }
+
+        return Vector3.Dot(normal, pointB - pointA);
+    }
+
+    private static (HalfEdge a, HalfEdge b, float distance) QueryEdgeDirection(CubeCollider cubeA,
+        CubeCollider cubeB)
+    {
+        var shapeA = cubeA.Shape.HalfEdges;
+        var shapeB = cubeB.Shape.HalfEdges;
+
+        (HalfEdge a, HalfEdge b, float separation) best = (null, null, float.MaxValue);
+
+        for (var indexA = 0; indexA < shapeA.Count; indexA += 2)
+        {
+            var halfEdgeA = cubeA.Shape.HalfEdges[indexA];
+
+            for (var indexB = 0; indexB < shapeB.Count; indexB += 2)
+            {
+                var halfEdgeB = cubeB.Shape.HalfEdges[indexB];
+
+                if (BuildMinkowskiFace(halfEdgeA, halfEdgeB))
+                {
+                    var separation = Distance(halfEdgeA, halfEdgeB, cubeA);
+                    if (separation < best.separation)
+                    {
+                        best = (halfEdgeA, halfEdgeB, separation);
+                    }
+                }
+            }
+        }
+
+        if (best.a != null)
+        {
+            var cp = Instantiate(Instance.DebugPoint,
+                (best.a.Vertex.Point + best.a.Next.Vertex.Point) * 0.5f, Quaternion.identity);
+            Destroy(cp, 0.1f);
+        }
+
+        Debug.Log($"best separation {best.separation}");
+
+        return best;
+    }
+
+
+    private static (Face face, float distance) QueryFaceDirection(CubeCollider cubeA,
+        CubeCollider cubeB)
+    {
+        var facesA = cubeA.Shape.Faces;
+
+        (Face face, float separation) best = (default, float.MinValue);
+
+        foreach (var faceA in facesA)
+        {
+            var vertexB = cubeB.Shape.GetSupportPoint(-faceA.Normal);
+            var distance = Vector3.Dot(faceA.Normal, vertexB - faceA.Points.A);
+
+            if (distance > best.separation)
+            {
+                best = (faceA, distance);
+            }
+        }
+
+        return best;
+    }
+
+    private static bool Overlap(CubeCollider cubeA, CubeCollider cubeB)
+    {
+        var faceQueryAB = QueryFaceDirection(cubeA, cubeB);
+        if (faceQueryAB.distance > 0f) return false;
+
+        var faceQueryBA = QueryFaceDirection(cubeB, cubeA);
+        if (faceQueryBA.distance > 0f) return false;
+
+        var edgeQuery = QueryEdgeDirection(cubeA, cubeB);
+        if (edgeQuery.distance > 0f) return false;
+
+        return true;
+    }
+
+    #endregion
 
     /// Firstly, implement lowest detail level, afterwards, we can try raising it.
     /// (return the bounding vertexes on creation)
@@ -274,15 +401,17 @@ public class CollideManager : MonoBehaviour
 
     private void Update()
     {
+        var others = new List<CubeCollider>();
         foreach (var a in cubeColliders)
         {
-            bool isColliding = false;
-            List<CubeCollider> others = new List<CubeCollider>();
+            var isColliding = false;
+            others.Clear();
             foreach (var b in cubeColliders)
             {
                 if (a.GetInstanceID() != b.GetInstanceID())
                 {
-                    if (IsColliding(a, b))
+                    // if (IsColliding(a, b))
+                    if (Overlap(a, b))
                     {
                         others.Add(b);
                         isColliding = true;

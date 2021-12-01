@@ -11,16 +11,4 @@ public class Cylinder : Shape
         Type = ShapeType.CYLINDER;
         RequestMeshData();
     }
-
-    public override void RequestMeshData()
-    {
-        MeshInfo = MeshGenerator.GenerateMesh(Type, Details);
-        UpdateMesh();
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
 }

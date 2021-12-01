@@ -1,106 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="9c34cb9f-7a42-428a-83f9-003d8d59d19f" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/Assets/Resources.meta" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Resources/Materials.meta" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Resources/Materials/Blue.mat" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Resources/Materials/Blue.mat.meta" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Resources/Materials/Red.mat" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Resources/Materials/Red.mat.meta" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Resources/Materials/Yellow.mat" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Resources/Materials/Yellow.mat.meta" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Resources/Prefabs.meta" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Resources/Prefabs/ConeMesh.prefab" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Resources/Prefabs/ConeMesh.prefab.meta" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Resources/Prefabs/CubeMesh.prefab" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Resources/Prefabs/CubeMesh.prefab.meta" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Resources/Prefabs/CylinderMesh.prefab" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Resources/Prefabs/CylinderMesh.prefab.meta" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Resources/Prefabs/DebugPoint.prefab" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Resources/Prefabs/DebugPoint.prefab.meta" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Resources/Prefabs/SphereMesh.prefab" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Resources/Prefabs/SphereMesh.prefab.meta" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Scripts/CollideManager.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Scripts/CollideManager.cs.meta" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Scripts/ContactPoint.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Scripts/ContactPoint.cs.meta" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Scripts/CubeCollider.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Scripts/CubeCollider.cs.meta" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Scripts/DetailLevel.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Scripts/DetailLevel.cs.meta" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Scripts/ICollidable.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Scripts/ICollidable.cs.meta" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Scripts/MeshGenerator.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Scripts/MeshGenerator.cs.meta" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Scripts/MeshStruct.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Scripts/MeshStruct.cs.meta" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Scripts/ShapeSpawner.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Scripts/ShapeSpawner.cs.meta" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Scripts/ShapeType.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Scripts/ShapeType.cs.meta" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Scripts/Shapes.meta" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Scripts/Shapes/Cone.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Scripts/Shapes/Cone.cs.meta" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Scripts/Shapes/Cube.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Scripts/Shapes/Cube.cs.meta" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Scripts/Shapes/Cylinder.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Scripts/Shapes/Cylinder.cs.meta" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Scripts/Shapes/Face.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Scripts/Shapes/Face.cs.meta" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Scripts/Shapes/HalfEdge.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Scripts/Shapes/HalfEdge.cs.meta" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Scripts/Shapes/Shape.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Scripts/Shapes/Shape.cs.meta" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Scripts/Shapes/Sphere.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Scripts/Shapes/Sphere.cs.meta" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Scripts/Shapes/Vertex.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Scripts/Shapes/Vertex.cs.meta" afterDir="false" />
+    <list default="true" id="9c34cb9f-7a42-428a-83f9-003d8d59d19f" name="Changes" comment="move stuff around">
       <change beforePath="$PROJECT_DIR$/.idea/.idea.CollisionDetection/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.CollisionDetection/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/CollideManager.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/CollideManager.cs.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/ContactPoint.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/ContactPoint.cs.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/CubeCollider.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/CubeCollider.cs.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/DetailLevel.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/DetailLevel.cs.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/ICollidable.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/ICollidable.cs.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Materials.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Materials/Blue.mat" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Materials/Blue.mat.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Materials/Red.mat" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Materials/Red.mat.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/MeshGenerator.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/MeshGenerator.cs.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/MeshStruct.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/MeshStruct.cs.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Prefabs.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Prefabs/ConeMesh.prefab" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Prefabs/ConeMesh.prefab.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Prefabs/CubeMesh.prefab" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Prefabs/CubeMesh.prefab.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Prefabs/CylinderMesh.prefab" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Prefabs/CylinderMesh.prefab.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Prefabs/SphereMesh.prefab" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Prefabs/SphereMesh.prefab.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/Prefabs/ConeMesh.prefab" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Resources/Prefabs/ConeMesh.prefab" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/Prefabs/CubeMesh.prefab" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Resources/Prefabs/CubeMesh.prefab" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/Prefabs/CylinderMesh.prefab" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Resources/Prefabs/CylinderMesh.prefab" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Assets/Scenes/CollisionTests.unity" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scenes/CollisionTests.unity" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/ShapeSpawner.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/ShapeSpawner.cs.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/ShapeType.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/ShapeType.cs.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Shapes.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Shapes/Cone.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Shapes/Cone.cs.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Shapes/Cube.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Shapes/Cube.cs.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Shapes/Cylinder.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Shapes/Cylinder.cs.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Shapes/Shape.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Shapes/Shape.cs.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Shapes/Sphere.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Shapes/Sphere.cs.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scripts/CollideManager.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/CollideManager.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scripts/ContactPoint.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/ContactPoint.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scripts/CubeCollider.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/CubeCollider.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scripts/MeshGenerator.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/MeshGenerator.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scripts/MeshStruct.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/MeshStruct.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scripts/Shapes/Cone.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/Shapes/Cone.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scripts/Shapes/Cube.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/Shapes/Cube.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scripts/Shapes/Cylinder.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/Shapes/Cylinder.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scripts/Shapes/Face.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/Shapes/Face.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scripts/Shapes/HalfEdge.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/Shapes/HalfEdge.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scripts/Shapes/Shape.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/Shapes/Shape.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scripts/Shapes/Sphere.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/Shapes/Sphere.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scripts/Shapes/Vertex.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/Shapes/Vertex.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -111,11 +30,21 @@
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
   <component name="HighlightingSettingsPerFile">
-    <setting file="file://$PROJECT_DIR$/Library/PackageCache/com.unity.ide.visualstudio@2.0.11/Editor/ProjectGeneration/ProjectGeneration.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/fd80350a03fb4f81873aacb5119f49359580/8a/d6e6792f/Matrix4x4.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Dummy.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Dummy.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/351e49e2a5bf4fd6beabb458ce2255f3ff600/ca/7363510e/Enumerable.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Dummy.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/6b1444477c1d41c692ef6c02a838308529ac30/49/d4acc6bd/List`1.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Dummy.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/ad3eaa0878d94cbe8e45f9c494d7164713bc00/38/199c7b50/Transform.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Library/PackageCache/com.unity.ide.visualstudio@2.0.11/Editor/ProjectGeneration/ProjectGeneration.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/ad3eaa0878d94cbe8e45f9c494d7164713bc00/cb/a0fb97a2/Mesh.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Dummy.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Dummy.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/ad3eaa0878d94cbe8e45f9c494d7164713bc00/6a/d7970538/Vector3.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/ad3eaa0878d94cbe8e45f9c494d7164713bc00/fb/88fa13ab/MonoBehaviour.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Dummy.cs" root0="SKIP_HIGHLIGHTING" />
   </component>
   <component name="ProjectId" id="20KiU5iuUEz9mmUiHZJ0sgHVHyl" />
   <component name="ProjectLevelVcsManager">
@@ -148,10 +77,10 @@
       </option>
       <method v="2" />
     </configuration>
-    <configuration name="Attach to Unity Editor" type="UNITY_DEBUG_RUN_CONFIGURATION" factoryName="Unity Debug" show_console_on_std_err="false" show_console_on_std_out="false" port="50000" address="localhost">
+    <configuration name="Attach to Unity Editor" type="UNITY_DEBUG_RUN_CONFIGURATION" factoryName="Unity Debug" show_console_on_std_err="false" show_console_on_std_out="false" port="50000" address="localhost" ignored-value-for-modified-check="22476">
       <option name="allowRunningInParallel" value="false" />
       <option name="listenPortForConnections" value="false" />
-      <option name="pid" />
+      <option name="pid" value="22476" />
       <option name="projectPathOnTarget" />
       <option name="selectedOptions">
         <list />
@@ -171,8 +100,23 @@
       <workItem from="1635799830733" duration="1625000" />
       <workItem from="1635801873288" duration="794000" />
       <workItem from="1636890552043" duration="17018000" />
-      <workItem from="1638139868303" duration="10777000" />
+      <workItem from="1638139868303" duration="40586000" />
     </task>
+    <task id="LOCAL-00001" summary="add faulty collision detection system&#10;add half-edge structure">
+      <created>1638222374215</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1638222374215</updated>
+    </task>
+    <task id="LOCAL-00002" summary="move stuff around">
+      <created>1638222393356</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1638222393356</updated>
+    </task>
+    <option name="localTasksCounter" value="3" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -196,5 +140,123 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
+    <MESSAGE value="add faulty collision detection system&#10;add half-edge structure" />
+    <MESSAGE value="move stuff around" />
+    <option name="LAST_COMMIT_MESSAGE" value="move stuff around" />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" type="DotNet Breakpoints">
+          <url>file://$PROJECT_DIR$/Assets/Scripts/CollideManager.cs</url>
+          <line>381</line>
+          <properties documentPath="D:\Projects\CollisionDetection\Assets\Scripts\CollideManager.cs" initialLine="369" containingFunctionPresentation="method 'Overlap'">
+            <startOffsets>
+              <option value="12671" />
+            </startOffsets>
+            <endOffsets>
+              <option value="12722" />
+            </endOffsets>
+          </properties>
+          <option name="timeStamp" value="5" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="DotNet Breakpoints">
+          <url>file://$PROJECT_DIR$/Assets/Scripts/CollideManager.cs</url>
+          <line>384</line>
+          <properties documentPath="D:\Projects\CollisionDetection\Assets\Scripts\CollideManager.cs" initialLine="372" containingFunctionPresentation="method 'Overlap'">
+            <startOffsets>
+              <option value="12785" />
+            </startOffsets>
+            <endOffsets>
+              <option value="12834" />
+            </endOffsets>
+          </properties>
+          <option name="timeStamp" value="6" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="DotNet Breakpoints">
+          <url>file://$PROJECT_DIR$/Assets/Scripts/CollideManager.cs</url>
+          <line>378</line>
+          <properties documentPath="D:\Projects\CollisionDetection\Assets\Scripts\CollideManager.cs" initialLine="366" containingFunctionPresentation="method 'Overlap'">
+            <startOffsets>
+              <option value="12557" />
+            </startOffsets>
+            <endOffsets>
+              <option value="12608" />
+            </endOffsets>
+          </properties>
+          <option name="timeStamp" value="7" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="DotNet Breakpoints">
+          <url>file://$PROJECT_DIR$/Assets/Scripts/CollideManager.cs</url>
+          <line>334</line>
+          <properties documentPath="D:\Projects\CollisionDetection\Assets\Scripts\CollideManager.cs" initialLine="332" containingFunctionPresentation="method 'QueryEdgeDirection'">
+            <startOffsets>
+              <option value="11381" />
+            </startOffsets>
+            <endOffsets>
+              <option value="11414" />
+            </endOffsets>
+          </properties>
+          <option name="timeStamp" value="16" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="DotNet Breakpoints">
+          <url>file://$PROJECT_DIR$/Assets/Scripts/CollideManager.cs</url>
+          <line>269</line>
+          <properties documentPath="D:\Projects\CollisionDetection\Assets\Scripts\CollideManager.cs" initialLine="266" containingFunctionPresentation="method 'BuildMinkowskiFace'">
+            <startOffsets>
+              <option value="9165" />
+            </startOffsets>
+            <endOffsets>
+              <option value="9202" />
+            </endOffsets>
+          </properties>
+          <option name="timeStamp" value="19" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="DotNet Breakpoints">
+          <url>file://$PROJECT_DIR$/Assets/Scripts/CollideManager.cs</url>
+          <line>364</line>
+          <properties documentPath="D:\Projects\CollisionDetection\Assets\Scripts\CollideManager.cs" initialLine="364" containingFunctionPresentation="method 'QueryFaceDirection'">
+            <startOffsets>
+              <option value="12179" />
+            </startOffsets>
+            <endOffsets>
+              <option value="12236" />
+            </endOffsets>
+          </properties>
+          <option name="timeStamp" value="22" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="DotNet Breakpoints">
+          <url>file://$PROJECT_DIR$/Assets/Scripts/Shapes/Shape.cs</url>
+          <line>68</line>
+          <properties documentPath="D:\Projects\CollisionDetection\Assets\Scripts\Shapes\Shape.cs" initialLine="68" containingFunctionPresentation="method 'GetSupportPoint'">
+            <startOffsets>
+              <option value="1960" />
+            </startOffsets>
+            <endOffsets>
+              <option value="2010" />
+            </endOffsets>
+          </properties>
+          <option name="timeStamp" value="23" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="DotNet Breakpoints">
+          <url>file://$PROJECT_DIR$/Assets/Scripts/Shapes/Shape.cs</url>
+          <line>50</line>
+          <properties documentPath="D:\Projects\CollisionDetection\Assets\Scripts\Shapes\Shape.cs" initialLine="50" containingFunctionPresentation="method 'GetSupportPoint'">
+            <startOffsets>
+              <option value="1445" />
+            </startOffsets>
+            <endOffsets>
+              <option value="1480" />
+            </endOffsets>
+          </properties>
+          <option name="timeStamp" value="24" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
+    <pin-to-top-manager>
+      <pinned-members>
+        <PinnedItemInfo parentTag="Type#Shape" memberName="MeshInfo" />
+      </pinned-members>
+    </pin-to-top-manager>
   </component>
 </project>

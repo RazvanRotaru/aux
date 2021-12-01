@@ -1,226 +1,183 @@
 using System.Collections.Generic;
-using System.Linq;
-using Shapes;
 using UnityEngine;
 
 public static class MeshGenerator
 {
-    private static List<Vector3> Vertices = new List<Vector3>();
-    private static List<int> Indices = new List<int>();
-    private static float Size = 1;
+    private static List<Vector3> _vertices = new List<Vector3>();
+    private static List<int> _indices = new List<int>();
+    private static float _size = 1f;
 
-    // Start is called before the first frame update
-    public static MeshStruct GenerateMesh(ShapeType Type, DetailLevel Details)
+    public static MeshStruct GenerateMesh(ShapeType type, DetailLevel details)
     {
-        MeshStruct MeshInfo = new MeshStruct();
-        Vertices.Clear();
-        Indices.Clear();
+        var MeshInfo = new MeshStruct();
+        _vertices.Clear();
+        _indices.Clear();
 
-        GenerateShape(Type, Details);
+        GenerateShape(type, details);
 
-        MeshInfo.VertexPosition = Vertices.ToArray();
-        MeshInfo.indices = Indices.ToArray();
-
-        var halfEdges = GenerateHalfEdges();
-        MeshInfo.HalfEdges = halfEdges;
+        MeshInfo.VertexPosition = _vertices.ToArray();
+        MeshInfo.Indices = _indices.ToArray();
 
         return MeshInfo;
     }
 
-    private static MeshStruct GenerateShape(ShapeType Type, DetailLevel Details)
+    private static void GenerateShape(ShapeType type, DetailLevel details)
     {
-        MeshStruct CurrentStruct = new MeshStruct();
+        var CurrentStruct = new MeshStruct();
 
-        switch (Type)
+        switch (type)
         {
             case ShapeType.CUBE:
-                GenerateCube(Details);
+                GenerateCube(details);
                 break;
             case ShapeType.CYLINDER:
-                GenerateCylinder(Details);
+                GenerateCylinder(details);
                 break;
             case ShapeType.CONE:
-                GenerateCone(Details);
+                GenerateCone(details);
                 break;
             case ShapeType.SPHERE:
-                GenerateSphere(Details);
+                GenerateSphere(details);
                 break;
             default:
                 break;
         }
-
-        return CurrentStruct;
     }
 
-    private static void GenerateCone(DetailLevel Details)
+    private static void GenerateCone(DetailLevel details)
     {
-        float DistanceBetweenRings = DistanceBetweenElements(Details);
-        int Height = (int) (1.0f / DistanceBetweenRings) + 1;
+        var DistanceBetweenRings = DistanceBetweenElements(details);
+        const int height = 1;
         float Angle = 0;
-        float AngleStep = Mathf.PI / (Height * 2);
-        int Counter = 0;
-        float Radius = 1.0f;
+        var AngleStep = Mathf.PI * (DistanceBetweenRings * 0.25f);
+        var Counter = 0;
+        const float radius = 1.0f;
 
-        for (int HeightIndex = 0; HeightIndex < Height - 1; HeightIndex++)
+        while (Angle < 2 * Mathf.PI)
         {
-            Angle = 0;
-            Counter = 0;
-            while (Angle < 2 * Mathf.PI)
-            {
-                Vertices.Add(ComputeCircleVertexPosition(HeightIndex, Angle, DistanceBetweenRings,
-                    Radius - (HeightIndex * DistanceBetweenRings)));
-                Angle += AngleStep;
-                Counter++;
-            }
+            _vertices.Add(ComputeCircleVertexPosition(Angle, radius));
+            Angle += AngleStep;
+            Counter++;
         }
 
         AddCenterPoints(ShapeType.CONE);
 
-        int PointsPerRing = Counter;
+        var PointsPerRing = Counter;
 
-        GenerateTriangles(Height, PointsPerRing, ShapeType.CONE);
+        GenerateTriangles(height, PointsPerRing, ShapeType.CONE);
     }
 
-    private static void GenerateCylinder(DetailLevel Details)
+    private static void GenerateCylinder(DetailLevel details)
     {
-        float DistanceBetweenRings = DistanceBetweenElements(Details);
-        int Height = (int) (1.0f / DistanceBetweenRings) + 1;
-        float Angle = 0;
-        float AngleStep = Mathf.PI / (Height * 2);
-        int Counter = 0;
-        float Radius = 1.0f;
+        var distanceBetweenRings = DistanceBetweenElements(details);
+        var height = (int) _size;
+        float angle = 0;
+        var angleStep = Mathf.PI * (distanceBetweenRings * 0.25f);
+        var counter = 0;
+        const float radius = 1f;
 
-        for (int HeightIndex = 0; HeightIndex < Height; HeightIndex++)
+        while (angle < 2 * Mathf.PI)
         {
-            Angle = 0;
-            Counter = 0;
-            while (Angle < 2 * Mathf.PI)
-            {
-                Vertices.Add(ComputeCircleVertexPosition(HeightIndex, Angle, DistanceBetweenRings, Radius));
-                Angle += AngleStep;
-                Counter++;
-            }
+            _vertices.Add(ComputeCircleVertexPosition(angle, radius));
+            angle += angleStep;
+            counter++;
+        }
+
+        angle = 0;
+        while (angle < 2 * Mathf.PI)
+        {
+            _vertices.Add(ComputeCircleVertexPosition(angle, radius, height));
+            angle += angleStep;
         }
 
         AddCenterPoints(ShapeType.CYLINDER);
 
-        int PointsPerRing = Counter;
+        var PointsPerRing = counter;
 
-        GenerateTriangles(Height, PointsPerRing, ShapeType.CYLINDER);
+        GenerateTriangles(height, PointsPerRing, ShapeType.CYLINDER);
     }
 
-    private static void GenerateSphere(DetailLevel Details)
+    private static void GenerateSphere(DetailLevel details)
     {
-        float DistanceBetweenRings = DistanceBetweenElements(Details);
-        int Height = (int) (1.0f / DistanceBetweenRings) + 1;
-        float Alpha = 0;
-        float Theta = Mathf.PI - 0.05f * Mathf.PI;
-        float AngleAlphaStep = Mathf.PI / (Height * 2);
-        float AngleThetaStep = Mathf.PI / (Height * 4);
-        int Counter = 0;
-        int SphereLayers = 0;
-        float Radius = 1.0f;
+        var distanceBetweenRings = DistanceBetweenElements(details);
+        var theta = Mathf.PI - 0.05f * Mathf.PI;
+        var angleAlphaStep = Mathf.PI * (distanceBetweenRings * 0.25f);
+        var angleThetaStep = Mathf.PI * (distanceBetweenRings * 0.125f);
+        var counter = 0;
+        var sphereLayers = 0;
+        var radius = _size;
 
-        while (Theta >= 0)
+        while (theta >= 0)
         {
-            Counter = 0;
-            Alpha = 0;
+            counter = 0;
+            float alpha = 0;
 
-            while (Alpha < 2 * Mathf.PI)
+            while (alpha < 2 * Mathf.PI)
             {
-                Vertices.Add(ComputeSphereVertexPosition(Alpha, Theta, Radius));
-                Alpha += AngleAlphaStep;
-                Counter++;
+                _vertices.Add(ComputeSphereVertexPosition(alpha, theta, radius));
+                alpha += angleAlphaStep;
+                counter++;
             }
 
-            Theta -= AngleThetaStep;
-            SphereLayers++;
+            theta -= angleThetaStep;
+            sphereLayers++;
         }
 
         AddCenterPoints(ShapeType.SPHERE);
 
-        int PointsPerRing = Counter;
+        var pointsPerRing = counter;
 
-        GenerateTriangles(SphereLayers, PointsPerRing, ShapeType.SPHERE);
+        GenerateTriangles(sphereLayers, pointsPerRing, ShapeType.SPHERE);
     }
 
-    private static void GenerateCube(DetailLevel Details)
+    private static void GenerateCube(DetailLevel details)
     {
-        float DistanceBetweenVerts = DistanceBetweenElements(Details);
+        var height = _size * 0.5f;
+        var width = _size * 0.5f;
+        var length = _size * 0.5f;
 
-        int Height;
-        int Width;
-        int Length;
-        Length = Height = Width = (int) (1.0f / DistanceBetweenVerts) + 1;
-
-        int Counter = 0;
-        // Generate the side planes first
-        for (int HeightIndex = 0; HeightIndex < Height; HeightIndex++)
+        _vertices.AddRange(new List<Vector3>
         {
-            int WidthIndex = 0;
-            int LengthIndex = 0;
-            Counter = 0;
+            new Vector3(-width, -height, -length),
+            new Vector3(width, -height, -length),
+            new Vector3(width, height, -length),
+            new Vector3(-width, height, -length),
+            new Vector3(-width, height, length),
+            new Vector3(width, height, length),
+            new Vector3(width, -height, length),
+            new Vector3(-width, -height, length),
+        });
 
-            for (; WidthIndex < Width; WidthIndex++)
-            {
-                Vector3 VertexPosition =
-                    ComputeCubeVertexPosition(HeightIndex, LengthIndex, WidthIndex, DistanceBetweenVerts);
-                Vertices.Add(VertexPosition);
-                Counter++;
-            }
-
-            WidthIndex--;
-
-            for (LengthIndex = 1; LengthIndex < Length; LengthIndex++)
-            {
-                Vector3 VertexPosition =
-                    ComputeCubeVertexPosition(HeightIndex, LengthIndex, WidthIndex, DistanceBetweenVerts);
-                Vertices.Add(VertexPosition);
-                Counter++;
-            }
-
-            LengthIndex--;
-
-            for (WidthIndex = WidthIndex - 1; WidthIndex >= 0; WidthIndex--)
-            {
-                Vector3 VertexPosition =
-                    ComputeCubeVertexPosition(HeightIndex, LengthIndex, WidthIndex, DistanceBetweenVerts);
-                Vertices.Add(VertexPosition);
-                Counter++;
-            }
-
-            WidthIndex++;
-
-            for (LengthIndex = LengthIndex - 1; LengthIndex >= 1; LengthIndex--)
-            {
-                Vector3 VertexPosition =
-                    ComputeCubeVertexPosition(HeightIndex, LengthIndex, WidthIndex, DistanceBetweenVerts);
-                Vertices.Add(VertexPosition);
-                Counter++;
-            }
-        }
-
-        AddCenterPoints(ShapeType.CUBE);
-
-        int InnerSlice = (Length - 2) * (Width - 2) > 0 ? (Length - 2) * (Width - 2) : 0;
-        int VertsPerLevel = Length * Width - InnerSlice;
-
-        GenerateTriangles(Height, VertsPerLevel, ShapeType.SPHERE);
+        _indices.AddRange(new List<int>
+        {
+            0, 2, 1, //face front
+            0, 3, 2,
+            2, 3, 4, //face top
+            2, 4, 5,
+            1, 2, 5, //face right
+            1, 5, 6,
+            0, 7, 4, //face left
+            0, 4, 3,
+            5, 4, 7, //face back
+            5, 7, 6,
+            0, 6, 7, //face bottom
+            0, 1, 6
+        });
     }
 
     private static float DistanceBetweenElements(DetailLevel Details)
     {
-        float DistanceBetweenVerts = 0.0f;
+        var DistanceBetweenVerts = 0.0f;
         switch (Details)
         {
             case DetailLevel.LOW:
-                DistanceBetweenVerts = Size;
+                DistanceBetweenVerts = _size;
                 break;
             case DetailLevel.MEDIUM:
-                DistanceBetweenVerts = Size / 2.0f;
+                DistanceBetweenVerts = _size / 2.0f;
                 break;
             case DetailLevel.HIGH:
-                DistanceBetweenVerts = Size / 4.0f;
+                DistanceBetweenVerts = _size / 4.0f;
                 break;
         }
 
@@ -229,31 +186,31 @@ public static class MeshGenerator
 
     private static Vector3 ComputeCubeVertexPosition(int H, int L, int W, float Distance)
     {
-        float X = -Size / 2.0f + W * Distance;
-        float Y = -Size / 2.0f + H * Distance;
-        float Z = -Size / 2.0f + L * Distance;
+        var X = -_size * 0.5f + W * Distance;
+        var Y = -_size * 0.5f + H * Distance;
+        var Z = -_size * 0.5f + L * Distance;
 
-        Vector3 VertexPosition = new Vector3(X, Y, Z);
+        var VertexPosition = new Vector3(X, Y, Z);
         return VertexPosition;
     }
 
-    private static Vector3 ComputeCircleVertexPosition(int H, float Angle, float Distance, float Radius)
+    private static Vector3 ComputeCircleVertexPosition(float angle, float radius, float height = 0f)
     {
-        float X = Radius * Mathf.Cos(Angle);
-        float Y = -Size / 2.0f + H * Distance;
-        float Z = +Radius * Mathf.Sin(Angle);
+        var X = radius * Mathf.Cos(angle);
+        var Y = -_size * 0.5f + height;
+        var Z = radius * Mathf.Sin(angle);
 
-        Vector3 VertexPosition = new Vector3(X, Y, Z);
+        var VertexPosition = new Vector3(X, Y, Z);
         return VertexPosition;
     }
 
     private static Vector3 ComputeSphereVertexPosition(float Alpha, float Theta, float Radius)
     {
-        float X = Radius * Mathf.Sin(Theta) * Mathf.Cos(Alpha);
-        float Y = Radius * Mathf.Cos(Theta);
-        float Z = Radius * Mathf.Sin(Theta) * Mathf.Sin(Alpha);
+        var X = Radius * Mathf.Sin(Theta) * Mathf.Cos(Alpha);
+        var Y = Radius * Mathf.Cos(Theta);
+        var Z = Radius * Mathf.Sin(Theta) * Mathf.Sin(Alpha);
 
-        Vector3 VertexPosition = new Vector3(X, Y, Z);
+        var VertexPosition = new Vector3(X, Y, Z);
         return VertexPosition;
     }
 
@@ -261,110 +218,78 @@ public static class MeshGenerator
     {
         if (Type == ShapeType.SPHERE)
         {
-            Vertices.Add(new Vector3(0.0f, -Size, 0.0f));
-            Vertices.Add(new Vector3(0.0f, Size, 0.0f));
+            _vertices.Add(new Vector3(0.0f, -_size, 0.0f));
+            _vertices.Add(new Vector3(0.0f, _size, 0.0f));
         }
         else
         {
-            Vertices.Add(new Vector3(0.0f, -Size / 2.0f, 0.0f));
-            Vertices.Add(new Vector3(0.0f, Size / 2.0f, 0.0f));
+            _vertices.Add(new Vector3(0.0f, -_size / 2.0f, 0.0f));
+            _vertices.Add(new Vector3(0.0f, _size / 2.0f, 0.0f));
         }
     }
 
-    private static void GenerateTriangles(int Height, int PointsPerLayer, ShapeType Type)
+    private static void GenerateTriangles(int height, int pointsPerLayer, ShapeType type)
     {
         // Compute the number of layers that we have to connect
-        int LayerLimit = Type == ShapeType.CONE ? Height - 2 : Height - 1;
+        var layerLimit = type == ShapeType.CONE ? height - 1 : height;
 
         // Connect the rings
-        for (int HeightIndex = 0; HeightIndex < LayerLimit; HeightIndex++)
+        for (var heightIndex = 0; heightIndex < layerLimit; heightIndex++)
         {
-            for (int InnerIndex = 0; InnerIndex < PointsPerLayer; InnerIndex++)
+            for (var innerIndex = 0; innerIndex < pointsPerLayer; innerIndex++)
             {
-                if (InnerIndex != PointsPerLayer - 1)
+                if (innerIndex != pointsPerLayer - 1)
                 {
                     // First triangle
-                    Indices.Add(HeightIndex * PointsPerLayer + InnerIndex);
-                    Indices.Add((HeightIndex + 1) * PointsPerLayer + InnerIndex);
-                    Indices.Add((HeightIndex + 1) * PointsPerLayer + InnerIndex + 1);
+                    _indices.Add(heightIndex * pointsPerLayer + innerIndex);
+                    _indices.Add((heightIndex + 1) * pointsPerLayer + innerIndex);
+                    _indices.Add((heightIndex + 1) * pointsPerLayer + innerIndex + 1);
 
                     // Second triangle
-                    Indices.Add((HeightIndex + 1) * PointsPerLayer + InnerIndex + 1);
-                    Indices.Add(HeightIndex * PointsPerLayer + InnerIndex + 1);
-                    Indices.Add(HeightIndex * PointsPerLayer + InnerIndex);
+                    _indices.Add((heightIndex + 1) * pointsPerLayer + innerIndex + 1);
+                    _indices.Add(heightIndex * pointsPerLayer + innerIndex + 1);
+                    _indices.Add(heightIndex * pointsPerLayer + innerIndex);
                 }
                 else
                 {
                     // First triangle
-                    Indices.Add(HeightIndex * PointsPerLayer + InnerIndex);
-                    Indices.Add((HeightIndex + 1) * PointsPerLayer + InnerIndex);
-                    Indices.Add((HeightIndex + 1) * PointsPerLayer);
+                    _indices.Add(heightIndex * pointsPerLayer + innerIndex);
+                    _indices.Add((heightIndex + 1) * pointsPerLayer + innerIndex);
+                    _indices.Add((heightIndex + 1) * pointsPerLayer);
 
                     // Second triangle
-                    Indices.Add((HeightIndex + 1) * PointsPerLayer);
-                    Indices.Add(HeightIndex * PointsPerLayer);
-                    Indices.Add(HeightIndex * PointsPerLayer + InnerIndex);
+                    _indices.Add((heightIndex + 1) * pointsPerLayer);
+                    _indices.Add(heightIndex * pointsPerLayer);
+                    _indices.Add(heightIndex * pointsPerLayer + innerIndex);
                 }
             }
         }
 
         // Draw bottom panel
-        for (int InnerIndex = 0; InnerIndex < PointsPerLayer - 1; InnerIndex++)
+        var bottomCenterIndex = (layerLimit + 1) * pointsPerLayer;
+        for (var innerIndex = 0; innerIndex < pointsPerLayer - 1; innerIndex++)
         {
-            Indices.Add(InnerIndex + 1);
-            Indices.Add((LayerLimit + 1) * PointsPerLayer);
-            Indices.Add(InnerIndex);
+            _indices.Add(innerIndex + 1);
+            _indices.Add(bottomCenterIndex);
+            _indices.Add(innerIndex);
         }
 
-        Indices.Add(0);
-        Indices.Add((LayerLimit + 1) * PointsPerLayer);
-        Indices.Add(PointsPerLayer - 1);
+        _indices.Add(0);
+        _indices.Add(bottomCenterIndex);
+        _indices.Add(pointsPerLayer - 1);
 
         // Draw top panel
-        for (int InnerIndex = 0; InnerIndex < PointsPerLayer - 1; InnerIndex++)
+        var topCenterIndex = (layerLimit + 1) * pointsPerLayer + 1;
+        for (var innerIndex = 0; innerIndex < pointsPerLayer - 1; innerIndex++)
         {
-            Indices.Add(LayerLimit * PointsPerLayer + InnerIndex);
-            Indices.Add((LayerLimit + 1) * PointsPerLayer + 1);
-            Indices.Add(LayerLimit * PointsPerLayer + InnerIndex + 1);
+            _indices.Add(layerLimit * pointsPerLayer + innerIndex);
+            _indices.Add(topCenterIndex);
+            _indices.Add(layerLimit * pointsPerLayer + innerIndex + 1);
         }
 
-        Indices.Add((LayerLimit + 1) * PointsPerLayer - 1);
-        Indices.Add((LayerLimit + 1) * PointsPerLayer + 1);
-        Indices.Add(LayerLimit * PointsPerLayer);
+        _indices.Add((layerLimit + 1) * pointsPerLayer - 1);
+        _indices.Add(topCenterIndex);
+        _indices.Add(layerLimit * pointsPerLayer);
     }
 
-    private static List<HalfEdge> GenerateHalfEdges()
-    {
-        var halfEdges = new Dictionary<(int, int), HalfEdge>();
-        var edges = new List<(int u, int v)> {(0, 1), (1, 2), (2, 0)};
-
-        var size = Indices.Count;
-        for (var i = 0; i < size; i += 3)
-        {
-            var A = Vertices[i];
-            var B = Vertices[i + 1];
-            var C = Vertices[i + 2];
-
-            foreach (var edge in edges)
-            {
-                var halfEdge = new HalfEdge();
-                halfEdges[edge] = halfEdge;
-                halfEdges[edge].Face = new Face(halfEdge, A, B, C);
-            }
-
-            foreach (var edge in edges)
-            {
-                halfEdges[edge].Next = halfEdges[((edge.u + 1) % 3, (edge.v + 1) % 3)];
-                var twinEdge = (edge.v, edge.u);
-
-                if (halfEdges.ContainsKey(twinEdge))
-                {
-                    halfEdges[edge].Twin = halfEdges[twinEdge];
-                    halfEdges[twinEdge].Twin = halfEdges[edge];
-                }
-            }
-        }
-
-        return halfEdges.Values.ToList();
-    }
 }

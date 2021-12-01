@@ -1,7 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-
 public class Cube : Shape
 {
     // Start is called before the first frame update
@@ -12,15 +8,9 @@ public class Cube : Shape
         RequestMeshData();
     }
 
-    public override void RequestMeshData()
+    private void Start()
     {
-        MeshInfo = MeshGenerator.GenerateMesh(Type, Details);
-        UpdateMesh();
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
+        // RequestMeshData();
+        Reset();
     }
 }
