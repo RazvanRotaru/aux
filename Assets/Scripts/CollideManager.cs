@@ -163,13 +163,13 @@ public class CollideManager : MonoBehaviour
             return false;
         }
 
-        // TODO Solve issues
-        var EdgeQuery = QueryEdgeDirection(cubeA, cubeB);
-        if (EdgeQuery.distance > 0f)
-        {
-            Debug.Log($"Edge Detection distance: {EdgeQuery.distance}");
-            return false;
-        }
+        // // TODO Solve issues
+        // var EdgeQuery = QueryEdgeDirection(cubeA, cubeB);
+        // if (EdgeQuery.distance > 0f)
+        // {
+        //     Debug.Log($"Edge Detection distance: {EdgeQuery.distance}");
+        //     return false;
+        // }
 
 
         // Debug.Log($"best separation {EdgeQuery.distance}");
@@ -178,15 +178,15 @@ public class CollideManager : MonoBehaviour
         var x = Mathf.Abs(faceQueryAb.distance) < Mathf.Abs(faceQueryBa.distance);
 
         var distance = x ? Mathf.Abs(faceQueryAb.distance) : Mathf.Abs(faceQueryBa.distance);
-        if (distance > EdgeQuery.distance)
-        {
-            if (Intersect(EdgeQuery.a.Vertex, EdgeQuery.a.Twin.Vertex, EdgeQuery.b.Vertex, EdgeQuery.b.Twin.Vertex,
-                out var contactPoint))
-            {
-                contactPoints.Add(contactPoint);
-            }
-        }
-        else
+        // if (distance > EdgeQuery.distance)
+        // {
+        //     if (Intersect(EdgeQuery.a.Vertex, EdgeQuery.a.Twin.Vertex, EdgeQuery.b.Vertex, EdgeQuery.b.Twin.Vertex,
+        //         out var contactPoint))
+        //     {
+        //         contactPoints.Add(contactPoint);
+        //     }
+        // }
+        // else
         {
             var referenceFace = x ? faceQueryAb.face : faceQueryBa.face;
             var incidentFace = MostAntiParallelFace(x ? cubeB : cubeA, referenceFace);
@@ -265,6 +265,7 @@ public class CollideManager : MonoBehaviour
             return false;
         }
 
+        // TODO use ContactPoint struct 
         contactPoint.x = a.x + mua * ab.x;
         contactPoint.y = a.y + mua * ab.y;
         contactPoint.z = a.z + mua * ab.z;
