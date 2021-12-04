@@ -3,6 +3,7 @@ using System.Linq;
 using System.Text;
 using Shapes;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 [RequireComponent(typeof(MeshRenderer))]
 [RequireComponent(typeof(MeshFilter))]
@@ -13,10 +14,10 @@ public class Shape : MonoBehaviour
     protected MeshRenderer ShapeMeshRenderer;
     protected ShapeType Type;
     [SerializeField] protected MeshStruct MeshInfo;
-    [SerializeField] protected Vector3 SpawnPoint;
-    [SerializeField] protected DetailLevel Details;
+    [SerializeField] protected Vector3 spawnPoint;
+    [SerializeField] protected DetailLevel details;
 
-    public List<HalfEdge> HalfEdges => MeshInfo.HalfEdges;
+    public List<HalfEdge> HalfEdges => MeshInfo.halfEdges;
     public List<Face> Faces => HalfEdges.Select(x => x.Face).Distinct().ToList();
 
     protected virtual void Reset()
@@ -29,9 +30,9 @@ public class Shape : MonoBehaviour
     [ContextMenu("Generate Shape")]
     public void RequestMeshData()
     {
-        MeshInfo = MeshGenerator.GenerateMesh(Type, Details);
+        MeshInfo = MeshGenerator.GenerateMesh(Type, details);
         var halfEdges = GenerateHalfEdges();
-        MeshInfo.HalfEdges = halfEdges;
+        MeshInfo.halfEdges = halfEdges;
 
         var s = new StringBuilder();
         halfEdges.ForEach(x => s.Append($"{x}\n"));
@@ -40,15 +41,15 @@ public class Shape : MonoBehaviour
         UpdateMesh();
     }
 
-    public void SetInfo(DetailLevel Details_, Vector3 SpawnPoint_)
+    public void SetInfo(DetailLevel details, Vector3 spawnPoint)
     {
-        Details = Details_;
-        SpawnPoint = SpawnPoint_;
+        details = details;
+        spawnPoint = spawnPoint;
     }
 
     public Vector3 GetSupportPoint(Vector3 direction)
     {
-        var vert = MeshInfo.VertexPosition;
+        var vert = MeshInfo.vertexPosition;
         var vertices = vert.Length;
         var bestVertex = 0;
 
@@ -69,12 +70,12 @@ public class Shape : MonoBehaviour
         return transform.TransformPoint(vert[bestVertex]);
     }
 
-    protected void UpdateMesh()
+    private void UpdateMesh()
     {
         ShapeMesh.Clear();
 
-        ShapeMesh.vertices = MeshInfo.VertexPosition;
-        ShapeMesh.triangles = MeshInfo.Indices;
+        ShapeMesh.vertices = MeshInfo.vertexPosition;
+        ShapeMesh.triangles = MeshInfo.indices;
         ShapeMesh.RecalculateNormals();
         ShapeMesh.Optimize();
 
@@ -84,36 +85,49 @@ public class Shape : MonoBehaviour
     private List<HalfEdge> GenerateHalfEdges()
     {
         var halfEdges = new Dictionary<(int, int), HalfEdge>();
+        
+        // CCO
+        // var edgeIndices = new List<(int u, int v)> {(0, 2), (2, 1), (1, 0)};
+
         var edgeIndices = new List<(int u, int v)> {(0, 1), (1, 2), (2, 0)};
+        var faces = new List<Face>();
 
-        var _indices = MeshInfo.Indices;
-        var _vertices = MeshInfo.VertexPosition;
+        var indices = MeshInfo.indices;
+        var vertices = MeshInfo.vertexPosition;
 
-        var size = _indices.Length;
+        var size = indices.Length;
         for (var i = 0; i < size; i += 3)
         {
-            var A = _indices[i];
-            var B = _indices[i + 1];
-            var C = _indices[i + 2];
-            var triangle = new List<int> {A, B, C};
+            var a = indices[i];
+            var b = indices[i + 1];
+            var c = indices[i + 2];
+            var triangle = new List<int> {a, b, c};
 
-            foreach (var (U, V) in edgeIndices)
+            foreach (var (u, v) in edgeIndices)
             {
-                var edge = (u: triangle[U], v: triangle[V]);
-                var halfEdge = new HalfEdge(transform);
+                var edge = (u: triangle[u], v: triangle[v]);
+                var halfEdge = new HalfEdge(transform, vertices[edge.u]);
                 halfEdges[edge] = halfEdge;
-                halfEdges[edge].Vertex = new Vertex(halfEdge, _vertices[edge.u]);
-                halfEdges[edge].Face = new Face(halfEdge, _vertices[A], _vertices[B], _vertices[C]);
+                var face = new Face(halfEdge, vertices[a], vertices[b], vertices[c]);
+                try
+                {
+                    var existingFace = faces.First(f => f.Equals(face));
+                    halfEdges[edge].Face = existingFace;
+                }
+                catch
+                {
+                    faces.Add(face);
+                    halfEdges[edge].Face = face;
+                }
             }
 
-            foreach (var (U, V) in edgeIndices)
+            foreach (var (u, v) in edgeIndices)
             {
-                var edge = (u: triangle[U], v: triangle[V]);
-                var nextEdge = (u: triangle[(U + 1) % 3], v: triangle[(V + 1) % 3]);
+                var edge = (u: triangle[u], v: triangle[v]);
+                var nextEdge = (u: triangle[(u + 1) % 3], v: triangle[(v + 1) % 3]);
                 halfEdges[edge].Next = halfEdges[nextEdge];
 
                 var twinEdge = (edge.v, edge.u);
-
                 if (halfEdges.ContainsKey(twinEdge))
                 {
                     halfEdges[edge].Twin = halfEdges[twinEdge];
@@ -124,6 +138,7 @@ public class Shape : MonoBehaviour
 
         var sortedHalfEdges = new List<HalfEdge>();
 
+
         foreach (var halfEdge in halfEdges.Values)
         {
             if (sortedHalfEdges.Contains(halfEdge))
@@ -131,9 +146,29 @@ public class Shape : MonoBehaviour
                 continue;
             }
 
+            // remove diagonal edges
+            if (halfEdge.Face.Equals(halfEdge.Twin.Face))
+            {
+                continue;
+            }
+
             sortedHalfEdges.Add(halfEdge);
             sortedHalfEdges.Add(halfEdge.Twin);
         }
+
+        // Add side planes to faces
+        foreach (var halfEdge in sortedHalfEdges)
+        {
+            halfEdge.Face.AddSidePlane(halfEdge.Twin);
+        }
+
+        // Set face centers
+        for (var i = 0; i < faces.Count; i++)
+        {
+            faces[i].SetCenter();
+        }
+
+        Debug.Log($"Generated {sortedHalfEdges.Count} edges and {faces.Count} faces");
 
         return sortedHalfEdges.Where(x => x.Face.Normal != Vector3.zero).ToList();
     }

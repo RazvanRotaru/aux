@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -9,62 +10,60 @@ public static class MeshGenerator
 
     public static MeshStruct GenerateMesh(ShapeType type, DetailLevel details)
     {
-        var MeshInfo = new MeshStruct();
+        var meshInfo = new MeshStruct();
         _vertices.Clear();
         _indices.Clear();
 
         GenerateShape(type, details);
 
-        MeshInfo.VertexPosition = _vertices.ToArray();
-        MeshInfo.Indices = _indices.ToArray();
+        meshInfo.vertexPosition = _vertices.ToArray();
+        meshInfo.indices = _indices.ToArray();
 
-        return MeshInfo;
+        return meshInfo;
     }
 
     private static void GenerateShape(ShapeType type, DetailLevel details)
     {
-        var CurrentStruct = new MeshStruct();
-
         switch (type)
         {
-            case ShapeType.CUBE:
-                GenerateCube(details);
+            case ShapeType.Cube:
+                GenerateCube();
                 break;
-            case ShapeType.CYLINDER:
+            case ShapeType.Cylinder:
                 GenerateCylinder(details);
                 break;
-            case ShapeType.CONE:
+            case ShapeType.Cone:
                 GenerateCone(details);
                 break;
-            case ShapeType.SPHERE:
+            case ShapeType.Sphere:
                 GenerateSphere(details);
                 break;
             default:
-                break;
+                throw new ArgumentOutOfRangeException(nameof(type), type, "Unknown type!");
         }
     }
 
     private static void GenerateCone(DetailLevel details)
     {
-        var DistanceBetweenRings = DistanceBetweenElements(details);
+        var distanceBetweenRings = DistanceBetweenElements(details);
         const int height = 1;
-        float Angle = 0;
-        var AngleStep = Mathf.PI * (DistanceBetweenRings * 0.25f);
-        var Counter = 0;
+        float angle = 0;
+        var angleStep = Mathf.PI * (distanceBetweenRings * 0.25f);
+        var counter = 0;
         const float radius = 1.0f;
 
-        while (Angle < 2 * Mathf.PI)
+        while (angle < 2 * Mathf.PI)
         {
-            _vertices.Add(ComputeCircleVertexPosition(Angle, radius));
-            Angle += AngleStep;
-            Counter++;
+            _vertices.Add(ComputeCircleVertexPosition(angle, radius));
+            angle += angleStep;
+            counter++;
         }
 
-        AddCenterPoints(ShapeType.CONE);
+        AddCenterPoints(ShapeType.Cone);
 
-        var PointsPerRing = Counter;
+        var pointsPerRing = counter;
 
-        GenerateTriangles(height, PointsPerRing, ShapeType.CONE);
+        GenerateTriangles(height, pointsPerRing, ShapeType.Cone);
     }
 
     private static void GenerateCylinder(DetailLevel details)
@@ -90,11 +89,11 @@ public static class MeshGenerator
             angle += angleStep;
         }
 
-        AddCenterPoints(ShapeType.CYLINDER);
+        AddCenterPoints(ShapeType.Cylinder);
 
-        var PointsPerRing = counter;
+        var pointsPerRing = counter;
 
-        GenerateTriangles(height, PointsPerRing, ShapeType.CYLINDER);
+        GenerateTriangles(height, pointsPerRing, ShapeType.Cylinder);
     }
 
     private static void GenerateSphere(DetailLevel details)
@@ -123,14 +122,14 @@ public static class MeshGenerator
             sphereLayers++;
         }
 
-        AddCenterPoints(ShapeType.SPHERE);
+        AddCenterPoints(ShapeType.Sphere);
 
         var pointsPerRing = counter;
 
-        GenerateTriangles(sphereLayers, pointsPerRing, ShapeType.SPHERE);
+        GenerateTriangles(sphereLayers, pointsPerRing, ShapeType.Sphere);
     }
 
-    private static void GenerateCube(DetailLevel details)
+    private static void  GenerateCube()
     {
         var height = _size * 0.5f;
         var width = _size * 0.5f;
@@ -165,58 +164,48 @@ public static class MeshGenerator
         });
     }
 
-    private static float DistanceBetweenElements(DetailLevel Details)
+    private static float DistanceBetweenElements(DetailLevel details)
     {
-        var DistanceBetweenVerts = 0.0f;
-        switch (Details)
+        var distanceBetweenVerts = 0.0f;
+        switch (details)
         {
-            case DetailLevel.LOW:
-                DistanceBetweenVerts = _size;
+            case DetailLevel.Low:
+                distanceBetweenVerts = _size;
                 break;
-            case DetailLevel.MEDIUM:
-                DistanceBetweenVerts = _size / 2.0f;
+            case DetailLevel.Medium:
+                distanceBetweenVerts = _size / 2.0f;
                 break;
-            case DetailLevel.HIGH:
-                DistanceBetweenVerts = _size / 4.0f;
+            case DetailLevel.High:
+                distanceBetweenVerts = _size / 4.0f;
                 break;
         }
 
-        return DistanceBetweenVerts;
-    }
-
-    private static Vector3 ComputeCubeVertexPosition(int H, int L, int W, float Distance)
-    {
-        var X = -_size * 0.5f + W * Distance;
-        var Y = -_size * 0.5f + H * Distance;
-        var Z = -_size * 0.5f + L * Distance;
-
-        var VertexPosition = new Vector3(X, Y, Z);
-        return VertexPosition;
+        return distanceBetweenVerts;
     }
 
     private static Vector3 ComputeCircleVertexPosition(float angle, float radius, float height = 0f)
     {
-        var X = radius * Mathf.Cos(angle);
-        var Y = -_size * 0.5f + height;
-        var Z = radius * Mathf.Sin(angle);
+        var x = radius * Mathf.Cos(angle);
+        var y = -_size * 0.5f + height;
+        var z = radius * Mathf.Sin(angle);
 
-        var VertexPosition = new Vector3(X, Y, Z);
-        return VertexPosition;
+        var vertexPosition = new Vector3(x, y, z);
+        return vertexPosition;
     }
 
-    private static Vector3 ComputeSphereVertexPosition(float Alpha, float Theta, float Radius)
+    private static Vector3 ComputeSphereVertexPosition(float alpha, float theta, float radius)
     {
-        var X = Radius * Mathf.Sin(Theta) * Mathf.Cos(Alpha);
-        var Y = Radius * Mathf.Cos(Theta);
-        var Z = Radius * Mathf.Sin(Theta) * Mathf.Sin(Alpha);
+        var x = radius * Mathf.Sin(theta) * Mathf.Cos(alpha);
+        var y = radius * Mathf.Cos(theta);
+        var z = radius * Mathf.Sin(theta) * Mathf.Sin(alpha);
 
-        var VertexPosition = new Vector3(X, Y, Z);
-        return VertexPosition;
+        var vertexPosition = new Vector3(x, y, z);
+        return vertexPosition;
     }
 
-    private static void AddCenterPoints(ShapeType Type)
+    private static void AddCenterPoints(ShapeType type)
     {
-        if (Type == ShapeType.SPHERE)
+        if (type == ShapeType.Sphere)
         {
             _vertices.Add(new Vector3(0.0f, -_size, 0.0f));
             _vertices.Add(new Vector3(0.0f, _size, 0.0f));
@@ -231,7 +220,7 @@ public static class MeshGenerator
     private static void GenerateTriangles(int height, int pointsPerLayer, ShapeType type)
     {
         // Compute the number of layers that we have to connect
-        var layerLimit = type == ShapeType.CONE ? height - 1 : height;
+        var layerLimit = type == ShapeType.Cone ? height - 1 : height;
 
         // Connect the rings
         for (var heightIndex = 0; heightIndex < layerLimit; heightIndex++)

@@ -1,13 +1,14 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using Shapes;
 using UnityEngine;
-using Object = UnityEngine.Object;
+using Plane = Shapes.Plane;
 
 public class CollideManager : MonoBehaviour
 {
-    private const float Eps = 10e-3f;
+    public const float Eps = 1e-3f;
     [SerializeField] private GameObject debugPoint;
 
     public static CollideManager Instance { get; private set; }
@@ -27,240 +28,8 @@ public class CollideManager : MonoBehaviour
 
     private void Reset()
     {
-        debugPoint = Resources.Load("Prefabs/DebugPoint.prefab") as GameObject;
+        debugPoint = Resources.Load("Prefabs/DebugPoint") as GameObject;
         print(debugPoint);
-    }
-
-    public static bool IsColliding(ICollidable a, ICollidable b)
-    {
-        if (a is CubeCollider A)
-        {
-            if (b is CubeCollider B)
-            {
-                return OBBvOBB(A, B);
-            }
-        }
-
-        return false;
-    }
-
-    private static bool OBBvOBB(CubeCollider a, CubeCollider b)
-    {
-        Func<CubeCollider, CubeCollider, Vector3, Vector3, float> SAT = (a, b, t, axis) =>
-        {
-            var ra = a.HalfWidth[0] * Mathf.Abs(Vector3.Dot(axis, a.U[0])) +
-                     a.HalfWidth[1] * Mathf.Abs(Vector3.Dot(axis, a.U[1])) +
-                     a.HalfWidth[2] * Mathf.Abs(Vector3.Dot(axis, a.U[2]));
-
-            var rb = b.HalfWidth[0] * Mathf.Abs(Vector3.Dot(axis, b.U[0])) +
-                     b.HalfWidth[1] * Mathf.Abs(Vector3.Dot(axis, b.U[1])) +
-                     b.HalfWidth[2] * Mathf.Abs(Vector3.Dot(axis, b.U[2]));
-
-            var dist = Mathf.Abs(Vector3.Dot(t, axis));
-
-            return ra + rb - dist;
-        };
-
-        var axes = new[]
-        {
-            a.U[0], // A0
-            a.U[1], // A1
-            a.U[2], // A2
-            b.U[0], // B0
-            b.U[1], // B1
-            b.U[2], // B2
-            Vector3.Cross(a.U[0], b.U[0]), // A0xB0
-            Vector3.Cross(a.U[0], b.U[1]), // A0xB1
-            Vector3.Cross(a.U[0], b.U[2]), // A0xB2
-            Vector3.Cross(a.U[1], b.U[0]), // A1xB0
-            Vector3.Cross(a.U[1], b.U[1]), // A1xB1
-            Vector3.Cross(a.U[1], b.U[2]), // A1xB2
-            Vector3.Cross(a.U[2], b.U[0]), // A2xB0
-            Vector3.Cross(a.U[2], b.U[1]), // A2xB1
-            Vector3.Cross(a.U[2], b.U[2]) // A2xB2
-        };
-
-
-        var t = b.Center - a.Center;
-        t = new Vector3(Vector3.Dot(t, a.U[0]), Vector3.Dot(t, a.U[1]), Vector3.Dot(t, a.U[2]));
-
-        float[,] R = new float[3, 3];
-        float[,] AbsR = new float[3, 3];
-
-        for (int i = 0; i < 3; i++)
-        {
-            for (int j = 0; j < 3; j++)
-            {
-                R[i, j] = Vector3.Dot(a.U[i], b.U[j]);
-            }
-        }
-
-        for (int i = 0; i < 3; i++)
-        {
-            for (int j = 0; j < 3; j++)
-            {
-                AbsR[i, j] = Mathf.Abs(R[i, j]) + Eps;
-            }
-        }
-
-        var minOverlap = float.MaxValue;
-        var index = -1;
-        bool useOne = false;
-
-        // foreach (var axis in axes)
-        for (int i = 0; i < axes.Length; ++i)
-        {
-            var overlap = SAT(a, b, t, axes[i]);
-            if (overlap < 0) return false;
-            if (overlap < minOverlap)
-            {
-                minOverlap = overlap;
-                index = i;
-            }
-
-            if (i == 6)
-            {
-                useOne = index > 2;
-            }
-        }
-
-        // TODO(): for some reason, the contact point is negative, but kinda correct
-        // TODO(RazvanRotaru): draw contact point
-        var contact = GetContactInfo(a, b, axes[index], index, minOverlap, useOne);
-        Debug.LogWarning($"<color=orange>{contact}</color>");
-        // Since no separating axis is found, the OBBs must be intersecting
-        return true;
-    }
-
-    private static ContactPoint GetContactInfo(CubeCollider a, CubeCollider b, Vector3 axis, int index,
-        float penetration, bool useOne)
-    {
-        Vector3 t = b.Center - a.Center;
-
-        Func<CubeCollider, CubeCollider, Vector3, int, ContactPoint> FacePoint = (a, b, t, index) =>
-        {
-            Vector3 normal = a.U[index];
-            if (Vector3.Dot(a.U[index], t) > 0)
-            {
-                normal *= -1.0f;
-            }
-
-            var vertex = b.HalfWidth;
-            if (Vector3.Dot(b.U[0], normal) < 0) vertex[0] = -vertex[0];
-            if (Vector3.Dot(b.U[1], normal) < 0) vertex[1] = -vertex[1];
-            if (Vector3.Dot(b.U[2], normal) < 0) vertex[2] = -vertex[2];
-
-            var point = new Vector3(vertex[0], vertex[1], vertex[2]);
-            var position = b.transform.InverseTransformVector(point);
-
-            return new ContactPoint(normal, penetration, position);
-        };
-
-        Func<Vector3, Vector3, float, Vector3, Vector3, float, Vector3> EdgePoint =
-            (aPoint, aAxis, aSize, bPoint, bAxis, bSize) =>
-            {
-                Vector3 toSt, cOne, cTwo;
-                float dpStaOne, dpStaTwo, dpOneTwo, smOne, smTwo;
-                float denom, mua, mub;
-
-                smOne = aAxis.sqrMagnitude;
-                smTwo = bAxis.sqrMagnitude;
-                dpOneTwo = Vector3.Dot(bAxis, aAxis);
-
-                toSt = aPoint - bPoint;
-                dpStaOne = Vector3.Dot(aAxis, toSt);
-                dpStaTwo = Vector3.Dot(bAxis, toSt);
-
-                denom = smOne * smTwo - dpOneTwo * dpOneTwo;
-
-                // Zero denominator indicates parrallel lines
-                if (Mathf.Abs(denom) < 10e-4f)
-                {
-                    return useOne ? aPoint : bPoint;
-                }
-
-                mua = (dpOneTwo * dpStaTwo - smTwo * dpStaOne) / denom;
-                mub = (smOne * dpStaTwo - dpOneTwo * dpStaOne) / denom;
-
-                // If either of the edges has the nearest point out
-                // of bounds, then the edges aren't crossed, we have
-                // an edge-face contact. Our point is on the edge, which
-                // we know from the useOne parameter.
-                if (mua > aSize ||
-                    mua < -aSize ||
-                    mub > bSize ||
-                    mub < -bSize)
-                {
-                    return useOne ? aPoint : bPoint;
-                }
-                else
-                {
-                    cOne = aPoint + aAxis * mua;
-                    cTwo = bPoint + bAxis * mub;
-
-                    return cOne * 0.5f + cTwo * 0.5f;
-                }
-            };
-
-        if (index < 3)
-        {
-            // // We've got a vertex of box two on a face of box one.
-            // fillPointFaceBoxBox(one, two, toCentre, data, best, pen);
-            // data->addContacts(1);
-            return FacePoint(a, b, t, index);
-        }
-        else if (index < 6)
-        {
-            // // We've got a vertex of box one on a face of box two.
-            // // We use the same algorithm as above, but swap around
-            // // one and two (and therefore also the vector between their
-            // // centres).
-            return FacePoint(b, a, -t, index);
-        }
-        else
-        {
-            index -= 6;
-            var aAxis = index / 3;
-            var bAxis = index % 3;
-
-            var ra = a.U[aAxis];
-            var rb = b.U[bAxis];
-
-            var L = Vector3.Cross(ra, rb).normalized;
-
-            if (Vector3.Dot(L, t) > 0) axis *= -1f;
-
-            // We have the axes, but not the edges: each axis has 4 edges parallel
-            // to it, we need to find which of the 4 for each object. We do
-            // that by finding the point in the centre of the edge. We know
-            // its component in the direction of the box's collision axis is zero
-            // (its a mid-point) and we determine which of the extremes in each
-            // of the other axes is closest.
-            var aPoint = a.HalfWidth;
-            var bPoint = b.HalfWidth;
-
-            for (int i = 0; i < 3; i++)
-            {
-                if (i == aAxis) aPoint[i] = 0;
-                else if (Vector3.Dot(a.U[i], axis) > 0) aPoint[i] = -aPoint[i];
-
-                if (i == bAxis) bPoint[i] = 0;
-                else if (Vector3.Dot(b.U[i], axis) < 0) bPoint[i] = -bPoint[i];
-            }
-
-            // Move them into world coordinates (they are already oriented
-            // correctly, since they have been derived from the axes).
-            var PA = new Vector3(aPoint[0], aPoint[1], aPoint[2]);
-            var PB = new Vector3(bPoint[0], bPoint[1], bPoint[2]);
-            PA = a.transform.InverseTransformPoint(PA);
-            PB = b.transform.InverseTransformPoint(PB);
-
-            // So we have a point and a direction for the colliding edges.
-            // We need to find out point of closest approach of the two
-            // line-segments.
-            var vertex = -EdgePoint(PA, ra, a.HalfWidth[aAxis], PB, rb, b.HalfWidth[bAxis]);
-            return new ContactPoint(L, -penetration, vertex);
-        }
     }
 
     #region GaussMap Optimization
@@ -275,37 +44,37 @@ public class CollideManager : MonoBehaviour
         var normalB2 = halfEdgeB.Twin.Face.Normal;
         var edgeB = halfEdgeB.Edge;
 
-        return IsMinkowskiFace(normalA1, normalA2, -normalB1, -normalB2, edgeA, -edgeB);
+        return IsMinkowskiFace(normalA1, normalA2, -normalB1, -normalB2, edgeA, edgeB);
     }
 
-    private static bool IsMinkowskiFace(Vector3 a, Vector3 b, Vector3 c, Vector3 d, Vector3 ab, Vector3 dc)
+    private static bool IsMinkowskiFace(Vector3 a, Vector3 b, Vector3 c, Vector3 d, Vector3 ba, Vector3 dc)
     {
-        var bxa = ab; //Vector3.Cross(b, a); //ab
-        var dxc = dc; //Vector3.Cross(d, c); //dc
+        var bxa = ba; //Vector3.Cross(b, a).normalized; //ab
+        var dxc = dc; //Vector3.Cross(d, c).normalized; //dc
 
         var cba = Vector3.Dot(c, bxa);
         var dba = Vector3.Dot(d, bxa);
         var adc = Vector3.Dot(a, dxc);
         var bdc = Vector3.Dot(b, dxc);
 
-        return cba * dba < 0 && adc * bdc < 0 && cba * bdc > 0;
+        return (cba * dba < 0f) && (adc * bdc < 0f) && (cba * bdc > 0f);
     }
 
     private static float Distance(HalfEdge halfEdgeA, HalfEdge halfEdgeB, CubeCollider cubeA)
     {
-        var edgeA = halfEdgeA.Edge.normalized;
-        var pointA = halfEdgeA.Vertex.Point;
+        var edgeA = halfEdgeA.Edge;
+        var pointA = halfEdgeA.Vertex;
 
-        var edgeB = halfEdgeB.Edge.normalized;
-        var pointB = halfEdgeB.Vertex.Point;
+        var edgeB = halfEdgeB.Edge;
+        var pointB = halfEdgeB.Vertex;
 
-        if (Math.Abs(Mathf.Abs(Vector3.Dot(edgeA, edgeB)) - 1f) < 1e-3f)
+        if (Mathf.Abs(Mathf.Abs(Vector3.Dot(edgeA.normalized, edgeB.normalized)) - 1f) < Eps)
         {
             return float.MinValue;
         }
 
         var normal = Vector3.Cross(edgeA, edgeB).normalized;
-        if (Vector3.Dot(normal, pointA - cubeA.Center) > 0f)
+        if (Vector3.Dot(normal, pointA - cubeA.Center) < 0f)
         {
             normal = -normal;
         }
@@ -318,37 +87,38 @@ public class CollideManager : MonoBehaviour
     {
         var shapeA = cubeA.Shape.HalfEdges;
         var shapeB = cubeB.Shape.HalfEdges;
+        // Debug.Log($"half edges for {cubeA}: {shapeA.Count}");
 
-        (HalfEdge a, HalfEdge b, float separation) best = (null, null, float.MaxValue);
+        (HalfEdge a, HalfEdge b, float separation) best = (null, null, float.MinValue);
 
-        for (var indexA = 0; indexA < shapeA.Count; indexA += 2)
+        for (var indexA = 0; indexA < shapeA.Count; indexA += 2) // += 2
         {
             var halfEdgeA = cubeA.Shape.HalfEdges[indexA];
 
-            for (var indexB = 0; indexB < shapeB.Count; indexB += 2)
+            for (var indexB = 0; indexB < shapeB.Count; indexB += 2) // +=2
             {
                 var halfEdgeB = cubeB.Shape.HalfEdges[indexB];
 
                 if (BuildMinkowskiFace(halfEdgeA, halfEdgeB))
                 {
                     var separation = Distance(halfEdgeA, halfEdgeB, cubeA);
-                    if (separation < best.separation)
+                    if (separation > best.separation)
                     {
                         best = (halfEdgeA, halfEdgeB, separation);
+                        if (separation > 0f)
+                        {
+                            best.a.Draw();
+                            best.b.Draw();
+                            return best;
+                        }
                     }
                 }
             }
         }
 
-        if (best.a != null)
-        {
-            var cp = Instantiate(Instance.DebugPoint,
-                (best.a.Vertex.Point + best.a.Next.Vertex.Point) * 0.5f, Quaternion.identity);
-            Destroy(cp, 0.1f);
-        }
-
-        Debug.Log($"best separation {best.separation}");
-
+        best.a.Draw();
+        best.b.Draw();
+        // Debug.LogWarning($"maximum separation: {best.separation.ToString(CultureInfo.InvariantCulture)}");
         return best;
     }
 
@@ -362,30 +132,287 @@ public class CollideManager : MonoBehaviour
 
         foreach (var faceA in facesA)
         {
+            // faceA.Draw();
             var vertexB = cubeB.Shape.GetSupportPoint(-faceA.Normal);
-            var distance = Vector3.Dot(faceA.Normal, vertexB - faceA.Points.A);
+            var distance = Vector3.Dot(faceA.Normal, vertexB - faceA.Points.First());
 
             if (distance > best.separation)
             {
-                best = (faceA, distance);
+                best.separation = distance;
+                best.face = faceA;
             }
         }
 
         return best;
     }
 
-    private static bool Overlap(CubeCollider cubeA, CubeCollider cubeB)
+    private static bool Overlap(CubeCollider cubeA, CubeCollider cubeB, out List<Vector3> contactPoints)
     {
-        var faceQueryAB = QueryFaceDirection(cubeA, cubeB);
-        if (faceQueryAB.distance > 0f) return false;
+        contactPoints = null;
+        var faceQueryAb = QueryFaceDirection(cubeA, cubeB);
+        if (faceQueryAb.distance > 0f)
+        {
+            // Debug.Log($"Face Detection A->B <color=red>Failed</color>! Distance: {faceQueryAb.distance}");
+            return false;
+        }
 
-        var faceQueryBA = QueryFaceDirection(cubeB, cubeA);
-        if (faceQueryBA.distance > 0f) return false;
+        var faceQueryBa = QueryFaceDirection(cubeB, cubeA);
+        if (faceQueryBa.distance > 0f)
+        {
+            // Debug.Log($"Face Detection B->A <color=red>Failed</color>! Distance: {faceQueryBa.distance}");
+            return false;
+        }
 
-        var edgeQuery = QueryEdgeDirection(cubeA, cubeB);
-        if (edgeQuery.distance > 0f) return false;
+        // TODO Solve issues
+        var EdgeQuery = QueryEdgeDirection(cubeA, cubeB);
+        if (EdgeQuery.distance > 0f)
+        {
+            Debug.Log($"Edge Detection distance: {EdgeQuery.distance}");
+            return false;
+        }
+
+
+        // Debug.Log($"best separation {EdgeQuery.distance}");
+        contactPoints = new List<Vector3>();
+
+        var x = Mathf.Abs(faceQueryAb.distance) < Mathf.Abs(faceQueryBa.distance);
+
+        var distance = x ? Mathf.Abs(faceQueryAb.distance) : Mathf.Abs(faceQueryBa.distance);
+        if (distance > EdgeQuery.distance)
+        {
+            if (Intersect(EdgeQuery.a.Vertex, EdgeQuery.a.Twin.Vertex, EdgeQuery.b.Vertex, EdgeQuery.b.Twin.Vertex,
+                out var contactPoint))
+            {
+                contactPoints.Add(contactPoint);
+            }
+        }
+        else
+        {
+            var referenceFace = x ? faceQueryAb.face : faceQueryBa.face;
+            var incidentFace = MostAntiParallelFace(x ? cubeB : cubeA, referenceFace);
+
+            {
+                referenceFace.Draw();
+                // incidentFace.Draw();
+            }
+
+            foreach (var sidePlane in referenceFace.SidePlanes)
+            {
+                sidePlane.Draw();
+
+                contactPoints.AddRange(GenerateContactPoints(sidePlane, incidentFace)
+                    .Where(p => Vector3.Dot(p, referenceFace.Normal) > 0f && Intersect(p, referenceFace)));
+            }
+        }
+
+        foreach (var point in contactPoints)
+        {
+            var cp = Instantiate(Instance.DebugPoint, point, Quaternion.identity);
+            Destroy(cp, 0.05f);
+        }
 
         return true;
+    }
+
+    #endregion
+
+    #region Sutherland-Hodgman clipping
+
+    public static bool Intersect(Vector3 a, Vector3 b, Vector3 c, Vector3 d,
+        out Vector3 contactPoint)
+    {
+        // Algorithm is ported from the C algorithm of 
+        // Paul Bourke at http://local.wasp.uwa.edu.au/~pbourke/geometry/lineline3d/
+        contactPoint = Vector3.negativeInfinity;
+
+        var ca = a - c;
+
+        var cd = d - c;
+        if (cd.sqrMagnitude < Eps)
+        {
+            return false;
+        }
+
+        var ab = b - a;
+        if (ab.sqrMagnitude < Eps)
+        {
+            return false;
+        }
+
+        var d1343 = ca.x * cd.x + ca.y * cd.y + ca.z * cd.z;
+        var d4321 = cd.x * ab.x + cd.y * ab.y + cd.z * ab.z;
+        var d1321 = ca.x * ab.x + ca.y * ab.y + ca.z * ab.z;
+        var d4343 = cd.x * cd.x + cd.y * cd.y + cd.z * cd.z;
+        var d2121 = ab.x * ab.x + ab.y * ab.y + ab.z * ab.z;
+
+        var denom = d2121 * d4343 - d4321 * d4321;
+        if (Mathf.Abs(denom) < Eps)
+        {
+            return false;
+        }
+
+        var numer = d1343 * d4321 - d1321 * d4343;
+
+        var mua = numer / denom;
+        if (mua < Eps || mua > 1f - Eps)
+        {
+            return false;
+        }
+
+        var mub = (d1343 + d4321 * mua) / d4343;
+        if (mub < Eps || mub > 1f - Eps)
+        {
+            return false;
+        }
+
+        contactPoint.x = a.x + mua * ab.x;
+        contactPoint.y = a.y + mua * ab.y;
+        contactPoint.z = a.z + mua * ab.z;
+
+        return true;
+    }
+
+    private static bool Intersect(Vector3 point, Face face)
+    {
+        var intersections = 0;
+        var dir = (face.Center - point).normalized;
+        if (Vector3.Dot(dir, -face.Normal) > Eps)
+        {
+            return false;
+        }
+
+        var p0 = point + dir * 100f;
+        Debug.DrawLine(point, p0, Color.blue, 0.02f, false);
+
+        var a = face.Points.Last();
+        foreach (var b in face.Points)
+        {
+            if (Intersect(point, p0, a, b, out var contact))
+            {
+                intersections += 1;
+            }
+
+            a = b;
+        }
+
+        return (intersections & 1) == 1;
+    }
+
+    // Create Plane class and use it here
+    private static bool Intersect(Vector3 a, Vector3 b, Plane plane, out Vector3 point)
+    {
+        // point = Vector3.negativeInfinity;
+        // var u = a - b;
+        // var dot = Vector3.Dot(plane.Normal, u);
+        //
+        // // if (Mathf.Abs(dot) > Eps)
+        // {
+        //     var planePoint = plane.Point;
+        //     var w = a - planePoint;
+        //     var fac = -Vector3.Dot(planePoint, w) / dot;
+        //
+        //     if (fac < 0f || fac > 1f)
+        //     {
+        //         return false;
+        //     }
+        //
+        //     point = a + u * fac;
+        //     return true;
+        // }
+        //
+        // return false;
+
+        // if (planeNormal.dot(lineDirection.normalize()) == 0) {
+        //     return null;
+        // }
+        //
+        // double t = (planeNormal.dot(planePoint) - planeNormal.dot(linePoint)) / planeNormal.dot(lineDirection.normalize());
+        // return linePoint.plus(lineDirection.normalize().scale(t));
+
+        point = Vector3.negativeInfinity;
+        var ab = b - a;
+        var dot = Vector3.Dot(plane.Normal, ab.normalized);
+        if (Mathf.Abs(dot) < Eps)
+        {
+            return false;
+        }
+
+        var t = (Vector3.Dot(plane.Normal, plane.Point) - Vector3.Dot(plane.Normal, a)) / dot;
+        point = a + ab.normalized * t;
+        return true;
+    }
+
+    private static IEnumerable<Vector3> GenerateContactPoints(Plane plane, Face incidentFace)
+    {
+        const int inFront = 1;
+        const int behind = -1;
+
+        Func<Vector3, int> planeSide = point =>
+            Vector3.Dot(point - plane.Point, plane.Normal) > 0 ? inFront : behind;
+
+
+        var points = new List<Vector3>();
+
+        // Use incident planes instead of faces.
+        var a = incidentFace.Points.Last();
+        var aSide = planeSide(a);
+
+
+        foreach (var b in incidentFace.Points)
+        {
+            var bSide = planeSide(b);
+
+            if (aSide == behind && bSide == inFront)
+            {
+                if (Intersect(a, b, plane, out var contactPoint))
+                {
+                    points.Add(contactPoint);
+                }
+            }
+            else if (aSide == inFront && bSide == behind)
+            {
+                if (Intersect(a, b, plane, out var contactPoint))
+                {
+                    points.Add(contactPoint);
+                }
+
+                points.Add(b);
+            }
+            else if (aSide == behind && bSide == behind)
+            {
+                points.Add(b);
+            }
+
+            a = b;
+            aSide = bSide;
+        }
+
+        return points;
+    }
+
+    static Face MostAntiParallelFace(CubeCollider polygon, Face refFace)
+    {
+        var faces = polygon.Shape.Faces;
+        // Debug.Log($"number of faces for {polygon}: {faces.Count}");
+        var mapf = (face: faces[0], dot: float.MinValue, distance: float.MaxValue);
+
+        foreach (var face in faces)
+        {
+            var dot = Vector3.Dot(face.Normal, -refFace.Normal);
+            if (dot >= mapf.dot)
+            {
+                // var Distance = Vector3.Distance(Face.HalfEdge.Vertex.Point, refFace.HalfEdge.Vertex.Point);
+                // if (Distance < Mapf.distance)
+                // {
+                //     Mapf = (Face, Dot, Distance);
+                // }
+
+                mapf.face = face;
+                mapf.dot = dot;
+            }
+        }
+
+        return mapf.face;
     }
 
     #endregion
@@ -410,8 +437,7 @@ public class CollideManager : MonoBehaviour
             {
                 if (a.GetInstanceID() != b.GetInstanceID())
                 {
-                    // if (IsColliding(a, b))
-                    if (Overlap(a, b))
+                    if (Overlap(a, b, out var contactPoints))
                     {
                         others.Add(b);
                         isColliding = true;
@@ -420,8 +446,8 @@ public class CollideManager : MonoBehaviour
             }
 
             var debugText = isColliding
-                ? "<color=green>is collinding</color>"
-                : "<color=red>is NOT colldinig</color>";
+                ? "<color=green>is colliding</color>"
+                : "<color=red>is NOT colliding</color>";
             Debug.Log($"{a} {debugText} with {others}: ");
             a.Collides(isColliding);
         }

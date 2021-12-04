@@ -2,11 +2,29 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="9c34cb9f-7a42-428a-83f9-003d8d59d19f" name="Changes" comment="move stuff around">
+      <change afterPath="$PROJECT_DIR$/Assets/Scripts/IDrawable.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Scripts/IDrawable.cs.meta" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Scripts/Shapes/Plane.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Scripts/Shapes/Plane.cs.meta" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.CollisionDetection/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.CollisionDetection/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Assets/Scenes/CollisionTests.unity" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scenes/CollisionTests.unity" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scripts/CollideManager.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/CollideManager.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scripts/ContactPoint.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/ContactPoint.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Assets/Scripts/CubeCollider.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/CubeCollider.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scripts/DetailLevel.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/DetailLevel.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scripts/MeshGenerator.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/MeshGenerator.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scripts/MeshStruct.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/MeshStruct.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scripts/ShapeSpawner.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/ShapeSpawner.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scripts/ShapeType.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/ShapeType.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scripts/Shapes/Cone.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/Shapes/Cone.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scripts/Shapes/Cube.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/Shapes/Cube.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Assets/Scripts/Shapes/Cylinder.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/Shapes/Cylinder.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scripts/Shapes/Face.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/Shapes/Face.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scripts/Shapes/HalfEdge.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/Shapes/HalfEdge.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Assets/Scripts/Shapes/Shape.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/Shapes/Shape.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scripts/Shapes/Sphere.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/Shapes/Sphere.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scripts/Shapes/Vertex.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scripts/Shapes/Vertex.cs.meta" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -16,20 +34,46 @@
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
+  <component name="GitSEFilterConfiguration">
+    <file-type-list>
+      <filtered-out-file-type name="LOCAL_BRANCH" />
+      <filtered-out-file-type name="REMOTE_BRANCH" />
+      <filtered-out-file-type name="TAG" />
+      <filtered-out-file-type name="COMMIT_BY_MESSAGE" />
+    </file-type-list>
+  </component>
   <component name="HighlightingSettingsPerFile">
-    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/fd80350a03fb4f81873aacb5119f49359580/8a/d6e6792f/Matrix4x4.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///Dummy.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///Dummy.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Library/PackageCache/com.unity.textmeshpro@3.0.6/Scripts/Editor/TMPro_FontAssetCreatorWindow.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Library/PackageCache/com.unity.collab-proxy@1.11.2/Editor/PlasticSCM/Views/Diff/DiffTreeViewMenu.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Library/PackageCache/com.unity.ugui@1.0.0/Runtime/UI/Core/ToggleGroup.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/351e49e2a5bf4fd6beabb458ce2255f3ff600/ca/7363510e/Enumerable.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Dummy.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Library/PackageCache/com.unity.ugui@1.0.0/Runtime/UI/Core/VertexModifiers/Shadow.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Library/PackageCache/com.unity.ugui@1.0.0/Runtime/UI/Core/Text.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/6b1444477c1d41c692ef6c02a838308529ac30/49/d4acc6bd/List`1.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Dummy.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/ad3eaa0878d94cbe8e45f9c494d7164713bc00/38/199c7b50/Transform.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/b70370f7c0e548a9ac87525f3abd0ef93ea30/36/b96be40e/Enumerable.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Library/PackageCache/com.unity.test-framework@1.1.29/UnityEngine.TestRunner/Utils/Vector4EqualityComparer.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/ad3eaa0878d94cbe8e45f9c494d7164713bc00/3c/789b19a8/Mathf.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Dummy.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Library/PackageCache/com.unity.timeline@1.4.8/Editor/Window/TimelineWindow_EditorCallbacks.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/695d1cc93cca45069c528c15c9fdd7493e2800/36/02b85da6/List`1.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Dummy.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/fd80350a03fb4f81873aacb5119f49359580/8a/d6e6792f/Matrix4x4.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Dummy.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Dummy.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/ad3eaa0878d94cbe8e45f9c494d7164713bc00/62/7dcc129d/FormerlySerializedAsAttribute.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Library/PackageCache/com.unity.collab-proxy@1.11.2/Editor/PlasticSCM/DrawStatusBar.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Library/PackageCache/com.unity.ide.visualstudio@2.0.11/Editor/ProjectGeneration/FileIOProvider.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Library/PackageCache/com.unity.collab-proxy@1.11.2/Editor/Collaborate/Models/Providers/Collab.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Library/PackageCache/com.unity.ide.visualstudio@2.0.11/Editor/ProjectGeneration/ProjectGeneration.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Library/PackageCache/com.unity.test-framework@1.1.29/UnityEditor.TestRunner/UnityTestProtocol/ITestRunnerApiMapper.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/ad3eaa0878d94cbe8e45f9c494d7164713bc00/cb/a0fb97a2/Mesh.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Dummy.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///Dummy.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/ad3eaa0878d94cbe8e45f9c494d7164713bc00/6a/d7970538/Vector3.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Library/PackageCache/com.unity.timeline@1.4.8/Editor/Actions/ActionManager.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Library/PackageCache/com.unity.test-framework@1.1.29/UnityEditor.TestRunner/Api/ITestResultAdaptor.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/ad3eaa0878d94cbe8e45f9c494d7164713bc00/fb/88fa13ab/MonoBehaviour.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Dummy.cs" root0="SKIP_HIGHLIGHTING" />
   </component>
@@ -51,6 +95,7 @@
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
     <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
+    <property name="settings.editor.selected.configurable" value="preferences.sourceCode.C#" />
     <property name="vue.rearranger.settings.migration" value="true" />
   </component>
   <component name="RunManager" selected="Attach to Unity Editor.Attach to Unity Editor">
@@ -64,10 +109,10 @@
       </option>
       <method v="2" />
     </configuration>
-    <configuration name="Attach to Unity Editor" type="UNITY_DEBUG_RUN_CONFIGURATION" factoryName="Unity Debug" show_console_on_std_err="false" show_console_on_std_out="false" port="50000" address="localhost" ignored-value-for-modified-check="22476">
+    <configuration name="Attach to Unity Editor" type="UNITY_DEBUG_RUN_CONFIGURATION" factoryName="Unity Debug" show_console_on_std_err="false" show_console_on_std_out="false" port="50000" address="localhost" ignored-value-for-modified-check="12284">
       <option name="allowRunningInParallel" value="false" />
       <option name="listenPortForConnections" value="false" />
-      <option name="pid" value="22476" />
+      <option name="pid" value="12284" />
       <option name="projectPathOnTarget" />
       <option name="selectedOptions">
         <list />
@@ -87,7 +132,7 @@
       <workItem from="1635799830733" duration="1625000" />
       <workItem from="1635801873288" duration="794000" />
       <workItem from="1636890552043" duration="17018000" />
-      <workItem from="1638139868303" duration="42144000" />
+      <workItem from="1638139868303" duration="95688000" />
     </task>
     <task id="LOCAL-00001" summary="add faulty collision detection system&#10;add half-edge structure">
       <created>1638222374215</created>
@@ -136,100 +181,88 @@
       <breakpoints>
         <line-breakpoint enabled="true" type="DotNet Breakpoints">
           <url>file://$PROJECT_DIR$/Assets/Scripts/CollideManager.cs</url>
-          <line>381</line>
-          <properties documentPath="D:\Projects\CollisionDetection\Assets\Scripts\CollideManager.cs" initialLine="369" containingFunctionPresentation="method 'Overlap'">
+          <line>88</line>
+          <properties documentPath="D:\Projects\CollisionDetection\Assets\Scripts\CollideManager.cs" initialLine="322" containingFunctionPresentation="method 'QueryEdgeDirection'">
             <startOffsets>
-              <option value="12671" />
+              <option value="2550" />
             </startOffsets>
             <endOffsets>
-              <option value="12722" />
+              <option value="2585" />
             </endOffsets>
           </properties>
-          <option name="timeStamp" value="5" />
+          <option name="timeStamp" value="34" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DotNet Breakpoints">
           <url>file://$PROJECT_DIR$/Assets/Scripts/CollideManager.cs</url>
-          <line>384</line>
-          <properties documentPath="D:\Projects\CollisionDetection\Assets\Scripts\CollideManager.cs" initialLine="372" containingFunctionPresentation="method 'Overlap'">
+          <line>389</line>
+          <properties documentPath="D:\Projects\CollisionDetection\Assets\Scripts\CollideManager.cs" initialLine="272" containingFunctionPresentation="method 'GenerateContactPoints'">
             <startOffsets>
-              <option value="12785" />
+              <option value="11561" />
             </startOffsets>
             <endOffsets>
-              <option value="12834" />
+              <option value="11575" />
             </endOffsets>
           </properties>
-          <option name="timeStamp" value="6" />
+          <option name="timeStamp" value="52" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DotNet Breakpoints">
           <url>file://$PROJECT_DIR$/Assets/Scripts/CollideManager.cs</url>
-          <line>378</line>
-          <properties documentPath="D:\Projects\CollisionDetection\Assets\Scripts\CollideManager.cs" initialLine="366" containingFunctionPresentation="method 'Overlap'">
+          <line>375</line>
+          <properties documentPath="D:\Projects\CollisionDetection\Assets\Scripts\CollideManager.cs" initialLine="255" containingFunctionPresentation="method 'GenerateContactPoints'">
             <startOffsets>
-              <option value="12557" />
+              <option value="11289" />
             </startOffsets>
             <endOffsets>
-              <option value="12608" />
+              <option value="11314" />
             </endOffsets>
           </properties>
-          <option name="timeStamp" value="7" />
+          <option name="timeStamp" value="53" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DotNet Breakpoints">
           <url>file://$PROJECT_DIR$/Assets/Scripts/CollideManager.cs</url>
-          <line>334</line>
-          <properties documentPath="D:\Projects\CollisionDetection\Assets\Scripts\CollideManager.cs" initialLine="332" containingFunctionPresentation="method 'QueryEdgeDirection'">
+          <line>373</line>
+          <properties documentPath="D:\Projects\CollisionDetection\Assets\Scripts\CollideManager.cs" initialLine="253" containingFunctionPresentation="method 'GenerateContactPoints'">
             <startOffsets>
-              <option value="11381" />
+              <option value="11201" />
             </startOffsets>
             <endOffsets>
-              <option value="11414" />
+              <option value="11250" />
             </endOffsets>
           </properties>
-          <option name="timeStamp" value="16" />
+          <option name="timeStamp" value="57" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="DotNet Breakpoints">
+          <url>file://$PROJECT_DIR$/Assets/Scripts/Shapes/Face.cs</url>
+          <line>46</line>
+          <properties documentPath="D:\Projects\CollisionDetection\Assets\Scripts\Shapes\Face.cs" initialLine="46" containingFunctionPresentation="method 'AddSidePlane'">
+            <startOffsets>
+              <option value="1329" />
+            </startOffsets>
+            <endOffsets>
+              <option value="1373" />
+            </endOffsets>
+          </properties>
+          <option name="timeStamp" value="68" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DotNet Breakpoints">
           <url>file://$PROJECT_DIR$/Assets/Scripts/CollideManager.cs</url>
-          <line>269</line>
-          <properties documentPath="D:\Projects\CollisionDetection\Assets\Scripts\CollideManager.cs" initialLine="266" containingFunctionPresentation="method 'BuildMinkowskiFace'">
+          <line>362</line>
+          <properties documentPath="D:\Projects\CollisionDetection\Assets\Scripts\CollideManager.cs" initialLine="264" containingFunctionPresentation="method 'GenerateContactPoints'">
             <startOffsets>
-              <option value="9165" />
+              <option value="10857" />
             </startOffsets>
             <endOffsets>
-              <option value="9202" />
+              <option value="10882" />
             </endOffsets>
           </properties>
-          <option name="timeStamp" value="19" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="DotNet Breakpoints">
-          <url>file://$PROJECT_DIR$/Assets/Scripts/Shapes/Shape.cs</url>
-          <line>68</line>
-          <properties documentPath="D:\Projects\CollisionDetection\Assets\Scripts\Shapes\Shape.cs" initialLine="68" containingFunctionPresentation="method 'GetSupportPoint'">
-            <startOffsets>
-              <option value="1951" />
-            </startOffsets>
-            <endOffsets>
-              <option value="2001" />
-            </endOffsets>
-          </properties>
-          <option name="timeStamp" value="23" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="DotNet Breakpoints">
-          <url>file://$PROJECT_DIR$/Assets/Scripts/Shapes/Shape.cs</url>
-          <line>50</line>
-          <properties documentPath="D:\Projects\CollisionDetection\Assets\Scripts\Shapes\Shape.cs" initialLine="50" containingFunctionPresentation="method 'GetSupportPoint'">
-            <startOffsets>
-              <option value="1436" />
-            </startOffsets>
-            <endOffsets>
-              <option value="1471" />
-            </endOffsets>
-          </properties>
-          <option name="timeStamp" value="24" />
+          <option name="timeStamp" value="69" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
     <pin-to-top-manager>
       <pinned-members>
         <PinnedItemInfo parentTag="Type#Shape" memberName="MeshInfo" />
+        <PinnedItemInfo parentTag="Type#System.ValueTuple`2" memberName="Item1" />
       </pinned-members>
     </pin-to-top-manager>
   </component>

@@ -4,7 +4,7 @@ public class Cube : Shape
     protected override void Reset()
     {
         base.Reset();
-        Type = ShapeType.CUBE;
+        Type = ShapeType.Cube;
         RequestMeshData();
     }
 

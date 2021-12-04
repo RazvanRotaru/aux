@@ -9,7 +9,7 @@ public class Cylinder : Shape
     protected override void Reset()
     {
         base.Reset();
-        Type = ShapeType.CYLINDER;
+        Type = ShapeType.Cylinder;
         RequestMeshData();
     }
 

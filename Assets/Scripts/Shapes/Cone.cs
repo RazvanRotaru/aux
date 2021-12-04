@@ -8,7 +8,7 @@ public class Cone : Shape
     protected override void Reset()
     {
         base.Reset();
-        Type = ShapeType.CONE;
+        Type = ShapeType.Cone;
         RequestMeshData();
     }
 }

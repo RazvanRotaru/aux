@@ -2,14 +2,15 @@ using System.Collections;
 using System.Collections.Generic;
 using Shapes;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 [System.Serializable]
 public struct MeshStruct
 {
-    public Vector3[] VertexPosition;
-    public Vector4[] VertexColors;
-    public Vector3[] VertexNormals;
-    public List<HalfEdge> HalfEdges;
+    [FormerlySerializedAs("VertexPosition")] public Vector3[] vertexPosition;
+    [FormerlySerializedAs("VertexColors")] public Vector4[] vertexColors;
+    [FormerlySerializedAs("VertexNormals")] public Vector3[] vertexNormals;
+    [FormerlySerializedAs("HalfEdges")] public List<HalfEdge> halfEdges;
 
-    public int[] Indices;
+    [FormerlySerializedAs("Indices")] public int[] indices;
 }

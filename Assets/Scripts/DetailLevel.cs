@@ -4,7 +4,7 @@ using UnityEngine;
 
 public enum DetailLevel
 {
-    LOW,
-    MEDIUM,
-    HIGH
+    Low,
+    Medium,
+    High
 }

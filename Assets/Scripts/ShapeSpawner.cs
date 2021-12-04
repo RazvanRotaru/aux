@@ -1,41 +1,42 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 public class ShapeSpawner : MonoBehaviour
 {
-    public Shape[] Shapes;
-    public GameObject ShapeHolder;
-    public float ObjectSpawnCooldown = 0.5f;
-    public DetailLevel Details;
-    private float NextSpawn;
+    [FormerlySerializedAs("Shapes")] public Shape[] shapes;
+    [FormerlySerializedAs("ShapeHolder")] public GameObject shapeHolder;
+    [FormerlySerializedAs("ObjectSpawnCooldown")] public float objectSpawnCooldown = 0.5f;
+    [FormerlySerializedAs("Details")] public DetailLevel details;
+    private float _nextSpawn;
 
 
     // Start is called before the first frame update
     private void Start()
     {
         Debug.Log("Started!");
-        NextSpawn = Time.time;
+        _nextSpawn = Time.time;
     }
 
     // Update is called once per frame
     private void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Z) && Time.time > NextSpawn)
+        if (Input.GetKeyDown(KeyCode.Z) && Time.time > _nextSpawn)
         {
             SpawnShape(0);
         }
-        if (Input.GetKeyDown(KeyCode.X) && Time.time > NextSpawn)
+        if (Input.GetKeyDown(KeyCode.X) && Time.time > _nextSpawn)
         {
             SpawnShape(1);
         }
         
-        if (Input.GetKeyDown(KeyCode.C) && Time.time > NextSpawn)
+        if (Input.GetKeyDown(KeyCode.C) && Time.time > _nextSpawn)
         {
             SpawnShape(2);
         }
         
-        if (Input.GetKeyDown(KeyCode.V) && Time.time > NextSpawn)
+        if (Input.GetKeyDown(KeyCode.V) && Time.time > _nextSpawn)
         {
             SpawnShape(3);
         }
@@ -43,13 +44,13 @@ public class ShapeSpawner : MonoBehaviour
 
     private void SpawnShape(int index)
     {
-        NextSpawn = Time.time + ObjectSpawnCooldown;
+        _nextSpawn = Time.time + objectSpawnCooldown;
 
         // Generate random position
-        Vector3 SpawnPosition = new Vector3(Random.Range(-3.0f, 3.0f), Random.Range(-3.0f, 3.0f), Random.Range(-3.0f, 3.0f));
+        Vector3 spawnPosition = new Vector3(Random.Range(-3.0f, 3.0f), Random.Range(-3.0f, 3.0f), Random.Range(-3.0f, 3.0f));
 
-        Shape NewShape = Instantiate(Shapes[index], SpawnPosition, Quaternion.identity);
-        NewShape.transform.parent = ShapeHolder.transform;
-        NewShape.SetInfo(Details, SpawnPosition);
+        Shape newShape = Instantiate(shapes[index], spawnPosition, Quaternion.identity);
+        newShape.transform.parent = shapeHolder.transform;
+        newShape.SetInfo(details, spawnPosition);
     }
 }

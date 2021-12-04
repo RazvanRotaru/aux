@@ -4,8 +4,8 @@ using UnityEngine;
 
 public enum ShapeType
 {
-    CUBE,
-    SPHERE,
-    CYLINDER,
-    CONE
+    Cube,
+    Sphere,
+    Cylinder,
+    Cone
 }
