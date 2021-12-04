@@ -1,4 +1,6 @@
+using System.Diagnostics;
 using UnityEngine;
+using Debug = UnityEngine.Debug;
 
 namespace Shapes
 {
@@ -58,9 +60,10 @@ namespace Shapes
                 minAxes.x = minAxes.x > vertices[i].x ? vertices[i].x : minAxes.x;
                 minAxes.y = minAxes.y > vertices[i].y ? vertices[i].y : minAxes.y;
                 minAxes.z = minAxes.z > vertices[i].z ? vertices[i].z : minAxes.z;
+
                 maxAxes.x = maxAxes.x < vertices[i].x ? vertices[i].x : maxAxes.x;
-                maxAxes.y = maxAxes.y < vertices[i].y ? vertices[i].z : maxAxes.y;
-                maxAxes.z = maxAxes.z < vertices[i].z ? vertices[i].y : maxAxes.z;
+                maxAxes.y = maxAxes.y < vertices[i].y ? vertices[i].y : maxAxes.y;
+                maxAxes.z = maxAxes.z < vertices[i].z ? vertices[i].z : maxAxes.z;
             }
 
             halfSizes.x = (maxAxes.x - minAxes.x) / 2.0f;

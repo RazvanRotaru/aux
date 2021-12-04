@@ -1,14 +1,18 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
 using Shapes;
 using UnityEngine;
+using Debug = UnityEngine.Debug;
 using Object = UnityEngine.Object;
 using Plane = Shapes.Plane;
 
 public class CollideManager : MonoBehaviour
 {
+    private static bool aux = false;
+
     public const float Eps = 1e-3f;
     [SerializeField] private GameObject debugPoint;
 
@@ -76,21 +80,47 @@ public class CollideManager : MonoBehaviour
 
     private static bool BuildMinkowskiFace(HalfEdge halfEdgeA, HalfEdge halfEdgeB)
     {
-        var normalA1 = halfEdgeA.Face.Normal;
-        var normalA2 = halfEdgeA.Twin.Face.Normal;
+        var normalA2 = halfEdgeA.Face.Normal;
+        var normalA1 = halfEdgeA.Twin.Face.Normal;
         var edgeA = halfEdgeA.Edge;
 
-        var normalB1 = halfEdgeB.Face.Normal;
-        var normalB2 = halfEdgeB.Twin.Face.Normal;
+        var normalB2 = halfEdgeB.Face.Normal;
+        var normalB1 = halfEdgeB.Twin.Face.Normal;
         var edgeB = halfEdgeB.Edge;
+
+        var dxc = Vector3.Cross(normalB2, normalB1).normalized; //dc
+        if (Vector3.Cross(dxc, edgeB.normalized).magnitude < Eps)
+        {
+            if (!aux)
+            {
+                Debug.Log($"Normal NOT OK: edge {edgeB} vs {dxc} for {normalB1} || {normalB2} ");
+                halfEdgeB.Draw(Color.blue);
+                Debug.DrawLine(halfEdgeB.Transform.position, halfEdgeB.Transform.position + 1.5f * dxc, Color.magenta,
+                    0.02f, false);
+
+                Debug.DrawLine(halfEdgeB.Transform.position + halfEdgeB.Transform.right * 0.05f,
+                    halfEdgeB.Transform.position + 1.5f * halfEdgeB.EdgeLocal, Color.white,
+                    0.02f, false);
+
+                halfEdgeA.Draw(Color.blue);
+                var bxa = Vector3.Cross(normalA2, normalA1).normalized; //dc
+                Debug.DrawLine(halfEdgeA.Transform.position, halfEdgeA.Transform.position + 1.5f * bxa, Color.magenta,
+                    0.02f, false);
+
+                Debug.DrawLine(halfEdgeA.Transform.position + halfEdgeA.Transform.right * 0.05f,
+                    halfEdgeA.Transform.position + 1.5f * halfEdgeA.EdgeLocal, Color.white,
+                    0.02f, false);
+                aux = true;
+            }
+        }
 
         return IsMinkowskiFace(normalA1, normalA2, -normalB1, -normalB2, edgeA, edgeB);
     }
 
     private static bool IsMinkowskiFace(Vector3 a, Vector3 b, Vector3 c, Vector3 d, Vector3 ba, Vector3 dc)
     {
-        var bxa = ba.normalized; //Vector3.Cross(b, a).normalized; //ab
-        var dxc = dc.normalized; //Vector3.Cross(d, c).normalized; //dc
+        var bxa = ba; //Vector3.Cross(b, a).normalized; //ab
+        var dxc = dc; //Vector3.Cross(d, c).normalized; //dc
 
         var cba = Vector3.Dot(c, bxa);
         var dba = Vector3.Dot(d, bxa);
@@ -108,7 +138,8 @@ public class CollideManager : MonoBehaviour
         var edgeB = halfEdgeB.Edge;
         var pointB = halfEdgeB.Vertex;
 
-        if (Mathf.Abs(Mathf.Abs(Vector3.Dot(edgeA.normalized, edgeB.normalized)) - 1f) < Eps)
+        // if (Mathf.Abs(Mathf.Abs(Vector3.Dot(edgeA.normalized, edgeB.normalized)) - 1f) < Eps)
+        if (Vector3.Cross(edgeA, edgeB).magnitude < Eps)
         {
             return float.MinValue;
         }
@@ -130,7 +161,7 @@ public class CollideManager : MonoBehaviour
         // Debug.Log($"half edges for {cubeA}: {shapeA.Count}");
 
         (HalfEdge a, HalfEdge b, float separation) best = (null, null, float.MinValue);
-
+        var checks = 0;
         for (var indexA = 0; indexA < shapeA.Count; indexA += 2) // += 2
         {
             var halfEdgeA = cubeA.Shape.HalfEdges[indexA];
@@ -143,19 +174,25 @@ public class CollideManager : MonoBehaviour
                 {
                     var separation = Distance(halfEdgeA, halfEdgeB, cubeA);
 
+                    // halfEdgeA.Draw(Color.Lerp(Color.red, Color.green, 1f / (separation * 10f + 1f)));
+                    // halfEdgeB.Draw(Color.Lerp(Color.red, Color.green, 1f / (separation * 10f + 1f)));
+
+                    checks += 1;
                     if (separation > best.separation)
                     {
                         best = (halfEdgeA, halfEdgeB, separation);
+
                         if (separation > 0f)
                         {
-                            {
-                                var center = (halfEdgeA.Vertex + halfEdgeA.Twin.Vertex) * 0.5f;
-                                var n = Vector3.Cross(halfEdgeA.Edge, -halfEdgeB.Edge);
-
-                                Debug.DrawLine(center, center + n, Color.magenta, 0.02f, false);
-                            }
-                            best.a.Draw(Color.Lerp(Color.red, Color.green, 1f / (separation * 10f + 1f)));
-                            best.b.Draw(Color.Lerp(Color.red, Color.green, 1f / (separation * 10f + 1f)));
+                            // {
+                            //     var center = (halfEdgeA.Vertex + halfEdgeA.Twin.Vertex) * 0.5f;
+                            //     var n = Vector3.Cross(halfEdgeA.Edge, -halfEdgeB.Edge);
+                            //
+                            //     Debug.DrawLine(center, center + n, Color.magenta, 0.02f, false);
+                            // }
+                            // best.a.Draw(Color.Lerp(Color.red, Color.green, 1f / (separation * 10f + 1f)));
+                            // best.b.Draw(Color.Lerp(Color.red, Color.green, 1f / (separation * 10f + 1f)));
+                            Debug.Log($"DID {checks} CJECLS");
                             return best;
                         }
                     }
@@ -163,6 +200,7 @@ public class CollideManager : MonoBehaviour
             }
         }
 
+        Debug.Log($"DID {checks} CJECLS");
         // Debug.LogWarning($"maximum separation: {best.separation.ToString(CultureInfo.InvariantCulture)}");
         return best;
     }
@@ -177,7 +215,7 @@ public class CollideManager : MonoBehaviour
 
         foreach (var faceA in facesA)
         {
-            faceA.Draw(Color.cyan);
+            // faceA.Draw(Color.cyan);
             var vertexB = cubeB.Shape.GetSupportPoint(-faceA.Normal);
             var distance = Vector3.Dot(faceA.Normal, vertexB - faceA.Points.First());
 
@@ -212,7 +250,7 @@ public class CollideManager : MonoBehaviour
         var EdgeQuery = QueryEdgeDirection(cubeA, cubeB);
         if (EdgeQuery.distance > 0f)
         {
-            Debug.Log($"Edge Detection distance: {EdgeQuery.distance}");
+            Debug.LogWarning($"Edge Detection distance: {EdgeQuery.distance}");
             return false;
         }
 
@@ -361,12 +399,9 @@ public class CollideManager : MonoBehaviour
             a = b;
         }
 
-        Debug.Log($"point {point} has {intersections} intersections");
-
         return (intersections & 1) == 1;
     }
 
-    // Create Plane class and use it here
     private static bool Intersect(Vector3 a, Vector3 b, Plane plane, out Vector3 point)
     {
         point = Vector3.negativeInfinity;
@@ -477,7 +512,7 @@ public class CollideManager : MonoBehaviour
                     if (a.IsColliding(b))
                     {
                         isColliding = true;
-                    } 
+                    }
                 }
             }
 
@@ -487,5 +522,7 @@ public class CollideManager : MonoBehaviour
             Debug.Log($"{a} {debugText} with {others}: ");
             a.Collides(isColliding);
         }
+
+        aux = false;
     }
 }

@@ -3,7 +3,6 @@ using System.Linq;
 using System.Text;
 using Shapes;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 [RequireComponent(typeof(MeshRenderer))]
 [RequireComponent(typeof(MeshFilter))]

@@ -24,7 +24,8 @@ namespace Shapes
         public Vector3 Vertex => Transform.TransformPoint(vertex); // The origin vertex of this half-edge
         public Vector3 VertexLocal => vertex;
 
-        public Vector3 Edge => Transform.TransformDirection(Next.Vertex - Vertex);
+        public Vector3 Edge => Transform.TransformDirection(EdgeLocal);
+        public Vector3 EdgeLocal => Next.Vertex - Vertex;
 
         public HalfEdge(Transform transform, Vector3 vertex)
         {
@@ -43,8 +44,15 @@ namespace Shapes
             cp.GetComponent<MeshRenderer>().material.color = color;
             cp.transform.localScale *= 0.33f;
             Object.Destroy(cp, 0.05f);
-            Debug.DrawLine(Vertex, Vertex + 1.25f * (Next.Vertex - Vertex), color, 0.02f, false);
+            
+            var ep = Object.Instantiate(CollideManager.Instance.DebugPoint, Twin.Vertex, Quaternion.identity);
+            ep.GetComponent<MeshRenderer>().material.color = Color.red;
+            ep.transform.localScale *= 0.33f;
+            Object.Destroy(ep, 0.05f);
+
+            Debug.DrawLine(Vertex, Vertex + EdgeLocal * 1.25f, color, 0.02f, false);
             Face.Draw(Color.green);
+            Twin.Face.Draw(Color.red);
         }
     }
 }

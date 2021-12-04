@@ -20,6 +20,7 @@ namespace Shapes
         public IEnumerable<HalfEdge> Edges => edges;
 
         public Vector3 Normal => HalfEdge.Transform.TransformDirection(normal).normalized;
+        public Vector3 NormalLocal => normal;
 
         public Vector3 Center => HalfEdge.Transform.TransformPoint(center);
 
