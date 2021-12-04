@@ -56,24 +56,57 @@ public class CollideManager : MonoBehaviour
 
     public static bool SphereVsOOB(SphereCollider a, PolygonCollider b)
     {
-        Vector3 localForward = b.transform.InverseTransformDirection(b.transform.forward);
-        Vector3 localRight = b.transform.InverseTransformDirection(b.transform.right);
-        Vector3 localUp = b.transform.InverseTransformDirection(b.transform.up);
+        Vector3 center = a.Center;
+        Vector3 realCenter = b.transform.InverseTransformPoint(center);
 
-        float minX = (b.Center - (localRight * b.HalfSize.x)).x;
-        float maxX = (b.Center + (localRight * b.HalfSize.x)).x;
-        float minY = (b.Center - (localUp * b.HalfSize.y)).y;
-        float maxY = (b.Center + (localUp * b.HalfSize.y)).y;
-        float minZ = (b.Center - (localForward * b.HalfSize.z)).z;
-        float maxZ = (b.Center + (localForward * b.HalfSize.z)).z;
+        float dist;
+        Vector3 closestPt = new Vector3(0, 0, 0);
+        dist = realCenter.x;
+        
+        // X axis
+        Vector3 halfSize = b.HalfSize;
+        if (dist > halfSize.x)
+        {
+            dist = halfSize.x;
+        }
 
-        float x = Mathf.Max(minX, Mathf.Min(a.Center.x, maxX));
-        float y = Mathf.Max(minY, Mathf.Min(a.Center.y, maxY));
-        float z = Mathf.Max(minZ, Mathf.Min(a.Center.z, maxZ));
+        if (dist < -halfSize.x)
+        {
+            dist = -halfSize.x;
+        }
+        closestPt.x = dist;
 
-        float distance = Vector3.Distance(new Vector3(x, y, z), a.Center);
+        // Y axis
+        dist = realCenter.y;
+        if (dist > halfSize.y)
+        {
+            dist = halfSize.y;
+        }
 
-        return distance < a.Radius;
+        if (dist < -halfSize.y)
+        {
+            dist = -halfSize.y;
+        }
+        closestPt.y = dist;
+
+        // Z axis
+        dist = realCenter.z;
+        if (dist > halfSize.z)
+        {
+            dist = halfSize.z;
+        }
+
+        if (dist < -halfSize.z)
+        {
+            dist = -halfSize.z;
+        }
+        closestPt.z = dist;
+
+        dist = Vector3.Distance(closestPt, realCenter);
+
+        Debug.Log("Distance: " + dist);
+
+        return dist < a.Radius;
     }
 
     #region GaussMap Optimization
