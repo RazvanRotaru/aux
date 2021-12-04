@@ -280,5 +280,4 @@ public static class MeshGenerator
         _indices.Add(topCenterIndex);
         _indices.Add(layerLimit * pointsPerLayer);
     }
-
 }

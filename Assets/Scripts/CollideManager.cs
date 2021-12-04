@@ -32,6 +32,45 @@ public class CollideManager : MonoBehaviour
         print(debugPoint);
     }
 
+    private static bool SphereVsSphere(SphereCollider a, SphereCollider b)
+    {
+        Vector3 aCenter = a.Center;
+        float aRadius = a.Radius;
+
+        Vector3 bCenter = b.Center;
+        float bRadius = b.Radius;
+
+        // Calculate squared distance between centers
+        Vector3 distance = aCenter - bCenter;
+        float dist2 = Vector3.Dot(distance, distance);
+
+        // Spheres intersect if squared distance is less than squared sum of radii
+        float radiusSum = aRadius + bRadius;
+        return dist2 <= radiusSum * radiusSum;
+    }
+
+    private static bool SphereVsOOB(SphereCollider a, CubeCollider b)
+    {
+        Vector3 localForward = b.transform.InverseTransformDirection(b.transform.forward);
+        Vector3 localRight = b.transform.InverseTransformDirection(b.transform.right);
+        Vector3 localUp = b.transform.InverseTransformDirection(b.transform.up);
+
+        float minX = (b.Center - (localRight * b.HalfSize.x)).x;
+        float maxX = (b.Center + (localRight * b.HalfSize.x)).x;
+        float minY = (b.Center - (localUp * b.HalfSize.y)).y;
+        float maxY = (b.Center + (localUp * b.HalfSize.y)).y;
+        float minZ = (b.Center - (localForward * b.HalfSize.z)).z;
+        float maxZ = (b.Center + (localForward * b.HalfSize.z)).z;
+
+        float x = Mathf.Max(minX, Mathf.Min(a.Center.x, maxX));
+        float y = Mathf.Max(minY, Mathf.Min(a.Center.y, maxY));
+        float z = Mathf.Max(minZ, Mathf.Min(a.Center.z, maxZ));
+
+        float distance = Vector3.Distance(new Vector3(x, y, z), a.Center);
+
+        return distance < a.Radius;
+    }
+
     #region GaussMap Optimization
 
     private static bool BuildMinkowskiFace(HalfEdge halfEdgeA, HalfEdge halfEdgeB)
@@ -429,28 +468,28 @@ public class CollideManager : MonoBehaviour
 
     private void Update()
     {
-        var others = new List<CubeCollider>();
-        foreach (var a in cubeColliders)
-        {
-            var isColliding = false;
-            others.Clear();
-            foreach (var b in cubeColliders)
-            {
-                if (a.GetInstanceID() != b.GetInstanceID())
-                {
-                    if (Overlap(a, b, out var contactPoints))
-                    {
-                        others.Add(b);
-                        isColliding = true;
-                    }
-                }
-            }
+        //var others = new List<CubeCollider>();
+        //foreach (var a in cubeColliders)
+        //{
+        //    var isColliding = false;
+        //    others.Clear();
+        //    foreach (var b in cubeColliders)
+        //    {
+        //        if (a.GetInstanceID() != b.GetInstanceID())
+        //        {
+        //            if (Overlap(a, b, out var contactPoints))
+        //            {
+        //                others.Add(b);
+        //                isColliding = true;
+        //            }
+        //        }
+        //    }
 
-            var debugText = isColliding
-                ? "<color=green>is colliding</color>"
-                : "<color=red>is NOT colliding</color>";
-            Debug.Log($"{a} {debugText} with {others}: ");
-            a.Collides(isColliding);
-        }
+        //    var debugText = isColliding
+        //        ? "<color=green>is colliding</color>"
+        //        : "<color=red>is NOT colliding</color>";
+        //    Debug.Log($"{a} {debugText} with {others}: ");
+        //    a.Collides(isColliding);
+        //}
     }
 }

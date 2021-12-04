@@ -13,12 +13,32 @@ public class Shape : MonoBehaviour
     protected MeshFilter ShapeMeshFilter;
     protected MeshRenderer ShapeMeshRenderer;
     protected ShapeType Type;
+    [SerializeField] private Material red;
+    [SerializeField] private Material blue;
     [SerializeField] protected MeshStruct MeshInfo;
     [SerializeField] protected Vector3 spawnPoint;
     [SerializeField] protected DetailLevel details;
 
     public List<HalfEdge> HalfEdges => MeshInfo.halfEdges;
     public List<Face> Faces => HalfEdges.Select(x => x.Face).Distinct().ToList();
+
+    private void Awake()
+    {
+        if (GetComponents<Collider>().Length == 0)
+        {
+            gameObject.AddComponent<SphereCollider>();
+        }
+    }
+
+    public Material GetContactMaterial()
+    {
+        return red;
+    }
+
+    public Material GetNormalMaterial()
+    {
+        return blue;
+    }
 
     protected virtual void Reset()
     {
@@ -43,8 +63,8 @@ public class Shape : MonoBehaviour
 
     public void SetInfo(DetailLevel details, Vector3 spawnPoint)
     {
-        details = details;
-        spawnPoint = spawnPoint;
+        this.details = details;
+        this.spawnPoint = spawnPoint;
     }
 
     public Vector3 GetSupportPoint(Vector3 direction)

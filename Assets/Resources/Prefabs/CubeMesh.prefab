@@ -95,8 +95,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 80a992355f558314baa43f9d3609ac97, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  SpawnPoint: {x: 0, y: 0, z: 0}
-  Details: 0
+  red: {fileID: 2100000, guid: bda8e881faa9ce0468afbea021f21dac, type: 2}
+  blue: {fileID: 2100000, guid: a20ebe7f9ff9ed84fac85b6196c33ab2, type: 2}
+  MeshInfo:
+    vertexPosition: []
+    vertexColors: []
+    vertexNormals: []
+    halfEdges: []
+    indices: 
+  spawnPoint: {x: 0, y: 0, z: 0}
+  details: 0
 --- !u!114 &1149861304526078464
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -109,7 +117,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3abccde8995caa443bfb12347fd2dd71, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _meshRenderer: {fileID: 0}
-  _meshFilter: {fileID: 0}
-  _red: {fileID: 2100000, guid: bda8e881faa9ce0468afbea021f21dac, type: 2}
-  _blue: {fileID: 2100000, guid: a20ebe7f9ff9ed84fac85b6196c33ab2, type: 2}
+  drawCollider: 0
+  meshRenderer: {fileID: 0}
+  meshFilter: {fileID: 0}
+  shape: {fileID: 0}
+  red: {fileID: 0}
+  blue: {fileID: 0}
