@@ -129,7 +129,7 @@ public static class MeshGenerator
         GenerateTriangles(sphereLayers, pointsPerRing, ShapeType.Sphere);
     }
 
-    private static void  GenerateCube()
+    private static void GenerateCube()
     {
         var height = _size * 0.5f;
         var width = _size * 0.5f;
@@ -220,7 +220,7 @@ public static class MeshGenerator
     private static void GenerateTriangles(int height, int pointsPerLayer, ShapeType type)
     {
         // Compute the number of layers that we have to connect
-        var layerLimit = type == ShapeType.Cone ? height - 1 : height;
+        var layerLimit = type == ShapeType.Cone || type == ShapeType.Sphere ? height - 1 : height;
 
         // Connect the rings
         for (var heightIndex = 0; heightIndex < layerLimit; heightIndex++)

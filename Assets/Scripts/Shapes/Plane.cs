@@ -21,7 +21,7 @@ namespace Shapes
             _transform = transform;
         }
 
-        public void Draw()
+        public void Draw(Color color)
         {
             // var cp = GameObject.CreatePrimitive(PrimitiveType.Cube);
             // cp.transform.position = Point;
@@ -38,7 +38,7 @@ namespace Shapes
             // // meshRenderer.material.SetColor("_Color", color);
             // meshRenderer.material.color = color;
             // Object.Destroy(cp, 0.02f);
-            Debug.DrawLine(Point, Point + Normal * 0.5f, Color.yellow, 0.02f, false);
+            Debug.DrawLine(Point, Point + Normal * 0.5f, color, 0.02f, false);
         }
     }
 }

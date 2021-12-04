@@ -94,9 +94,9 @@ namespace Shapes
             return sb.ToString();
         }
 
-        public void Draw()
+        public void Draw(Color color)
         {
-            Debug.DrawLine(Center, Center + Normal, Color.green, 0.02f, false);
+            Debug.DrawLine(Center, Center + Normal, color, 0.02f, false);
         }
 
         public bool Equals(Face other)

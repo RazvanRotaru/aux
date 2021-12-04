@@ -1,5 +1,6 @@
 using System;
 using UnityEngine;
+using Object = UnityEngine.Object;
 
 namespace Shapes
 {
@@ -36,10 +37,14 @@ namespace Shapes
             return $"vert: {Vertex}, face: {Face}";
         }
 
-        public void Draw()
+        public void Draw(Color color)
         {
-            Debug.DrawLine(Vertex, 2 * Next.Vertex - Vertex, Color.magenta, 0.02f, false);
-            Face.Draw();
+            var cp = Object.Instantiate(CollideManager.Instance.DebugPoint, Vertex, Quaternion.identity);
+            cp.GetComponent<MeshRenderer>().material.color = color;
+            cp.transform.localScale *= 0.33f;
+            Object.Destroy(cp, 0.05f);
+            Debug.DrawLine(Vertex, Vertex + 1.25f * (Next.Vertex - Vertex), color, 0.02f, false);
+            Face.Draw(Color.green);
         }
     }
 }

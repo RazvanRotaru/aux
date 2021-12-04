@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Shapes;
 using UnityEngine;
 
 [RequireComponent(typeof(MeshRenderer), typeof(MeshFilter))]
@@ -36,12 +37,22 @@ public class SphereCollider : Collider
         meshRenderer.material = value ? red : blue;
     }
 
+    public override bool IsColliding(Collider other)
+    {
+        return other switch
+        {
+            SphereCollider sphereCollider => CollideManager.SphereVsSphere(sphereCollider, this),
+            PolygonCollider polygonCollider => CollideManager.SphereVsOOB(this, polygonCollider),
+            _ => false
+        };
+    }
+
     private void OnDrawGizmos()
     {
         if (drawCollider && radius > 0)
         {
             Gizmos.color = Color.green;
-            Gizmos.DrawSphere(transform.position, radius);
+            Gizmos.DrawWireSphere(transform.position, radius);
         }
     }
 }

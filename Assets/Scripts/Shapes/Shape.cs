@@ -15,6 +15,7 @@ public class Shape : MonoBehaviour
     protected ShapeType Type;
     [SerializeField] private Material red;
     [SerializeField] private Material blue;
+    [SerializeField] private Material yellow;
     [SerializeField] protected MeshStruct MeshInfo;
     [SerializeField] protected Vector3 spawnPoint;
     [SerializeField] protected DetailLevel details;
@@ -40,6 +41,8 @@ public class Shape : MonoBehaviour
         return blue;
     }
 
+    public Material NearMaterial => yellow;
+
     protected virtual void Reset()
     {
         ShapeMesh = new Mesh();
@@ -50,6 +53,10 @@ public class Shape : MonoBehaviour
     [ContextMenu("Generate Shape")]
     public void RequestMeshData()
     {
+        blue = Resources.Load<Material>("Materials/Blue");
+        red = Resources.Load<Material>("Materials/Red");
+        yellow = Resources.Load<Material>("Materials/Yellow");
+        
         MeshInfo = MeshGenerator.GenerateMesh(Type, details);
         var halfEdges = GenerateHalfEdges();
         MeshInfo.halfEdges = halfEdges;
@@ -105,7 +112,7 @@ public class Shape : MonoBehaviour
     private List<HalfEdge> GenerateHalfEdges()
     {
         var halfEdges = new Dictionary<(int, int), HalfEdge>();
-        
+
         // CCO
         // var edgeIndices = new List<(int u, int v)> {(0, 2), (2, 1), (1, 0)};
 

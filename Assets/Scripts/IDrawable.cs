@@ -1,4 +1,6 @@
+using UnityEngine;
+
 public interface IDrawable
 {
-    void Draw();
+    void Draw(Color color);
 }

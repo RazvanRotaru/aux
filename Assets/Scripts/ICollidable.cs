@@ -1,4 +1,6 @@
+using Shapes;
+
 public interface ICollidable
 {
-    bool IsColliding(ICollidable other);
+    bool IsColliding(Collider other);
 }
