@@ -56,7 +56,7 @@ public class Shape : MonoBehaviour
         blue = Resources.Load<Material>("Materials/Blue");
         red = Resources.Load<Material>("Materials/Red");
         yellow = Resources.Load<Material>("Materials/Yellow");
-        
+
         MeshInfo = MeshGenerator.GenerateMesh(Type, details);
         var halfEdges = GenerateHalfEdges();
         MeshInfo.halfEdges = halfEdges;
@@ -195,8 +195,9 @@ public class Shape : MonoBehaviour
             faces[i].SetCenter();
         }
 
-        Debug.Log($"Generated {sortedHalfEdges.Count} edges and {faces.Count} faces");
+        var edges = sortedHalfEdges.Where(x => x.Face.Normal != Vector3.zero).ToList();
 
-        return sortedHalfEdges.Where(x => x.Face.Normal != Vector3.zero).ToList();
+        Debug.Log($"Generated {edges.Count} edges and {faces.Count} faces");
+        return edges;
     }
 }

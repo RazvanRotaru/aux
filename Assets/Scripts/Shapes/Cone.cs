@@ -11,4 +11,10 @@ public class Cone : Shape
         Type = ShapeType.Cone;
         RequestMeshData();
     }
+
+    private void Start()
+    {
+        // RequestMeshData();
+        Reset();
+    }
 }

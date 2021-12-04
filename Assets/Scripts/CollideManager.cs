@@ -177,7 +177,7 @@ public class CollideManager : MonoBehaviour
 
         foreach (var faceA in facesA)
         {
-            // faceA.Draw();
+            faceA.Draw(Color.cyan);
             var vertexB = cubeB.Shape.GetSupportPoint(-faceA.Normal);
             var distance = Vector3.Dot(faceA.Normal, vertexB - faceA.Points.First());
 
@@ -478,11 +478,6 @@ public class CollideManager : MonoBehaviour
                     {
                         isColliding = true;
                     } 
-                    // if (OBBvsOBB(a, b, out var contactPoints))
-                    // {
-                    //     others.Add(b);
-                    //     isColliding = true;
-                    // }
                 }
             }
 
