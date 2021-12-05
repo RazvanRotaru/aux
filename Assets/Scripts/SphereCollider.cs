@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using Shapes;
 using UnityEngine;
+using ContactPoint = Shapes.ContactPoint;
 
 [RequireComponent(typeof(MeshRenderer), typeof(MeshFilter))]
 public class SphereCollider : Collider
@@ -37,12 +38,14 @@ public class SphereCollider : Collider
         meshRenderer.material = value ? red : blue;
     }
 
-    public override bool IsColliding(Collider other)
+    public override bool IsColliding(Collider other, out List<ContactPoint> contactPoints)
     {
+        contactPoints = null;
         return other switch
         {
-            SphereCollider sphereCollider => CollideManager.SphereVsSphere(sphereCollider, this),
+            SphereCollider sphereCollider => CollideManager.SphereVsSphere(sphereCollider, this, out contactPoints),
             PolygonCollider polygonCollider => CollideManager.SphereVsOOB(this, polygonCollider),
+            HalfPlaneCollider hP => CollideManager.HalfPlaneVsObject(hP.Plane, this, out contactPoints),
             _ => false
         };
     }

@@ -80,10 +80,6 @@ public static class MeshGenerator
         var counter = 0;
         const float radius = 1f;
 
-        Debug.Log(angleStep);
-        Debug.Log(2.0f * Mathf.PI);
-        Debug.Log(Mathf.PI / angleStep);
-
         while (angle < 2.0f * Mathf.PI - 0.001f)
         {
             _vertices.Add(ComputeCircleVertexPosition(angle, radius));

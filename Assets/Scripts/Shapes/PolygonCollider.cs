@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Diagnostics;
 using UnityEngine;
 using Debug = UnityEngine.Debug;
@@ -32,22 +33,22 @@ namespace Shapes
             ComputeProperties(meshFilter.mesh.vertices);
         }
 
-        public override bool IsColliding(Collider other)
+        public override bool IsColliding(Collider other, out List<ContactPoint> contactPoints)
         {
-            if (other is SphereCollider sphereCollider)
+            contactPoints = null;
+            switch (other)
             {
-                return CollideManager.SphereVsOOB(sphereCollider, this);
-            }
-            else if (other is PolygonCollider polygonCollider)
-            {
-                if (CollideManager.SphereVsSphere(SphereCollider, polygonCollider.SphereCollider))
-                {
+                case SphereCollider sphereCollider:
+                    return CollideManager.SphereVsOOB(sphereCollider, this);
+                case PolygonCollider polygonCollider
+                    when CollideManager.SphereVsSphere(SphereCollider, polygonCollider.SphereCollider, out _):
                     isNear = true;
-                    return CollideManager.OOBVsOOB(this, polygonCollider, out var contactPoints);
-                }
+                    return CollideManager.OOBVsOOB(this, polygonCollider, out contactPoints);
+                case HalfPlaneCollider halfPlaneCollider:
+                    return CollideManager.HalfPlaneVsObject(halfPlaneCollider.Plane, this, out contactPoints);
+                default:
+                    return false;
             }
-
-            return false;
         }
 
         void ComputeProperties(Vector3[] vertices)
@@ -69,9 +70,6 @@ namespace Shapes
                 maxAxes.y = maxAxes.y < vertices[i].y ? vertices[i].y : maxAxes.y;
                 maxAxes.z = maxAxes.z < vertices[i].z ? vertices[i].z : maxAxes.z;
             }
-
-            Debug.Log(maxAxes);
-            Debug.Log(minAxes);
 
             halfSizes.x = (maxAxes.x - minAxes.x) / 2.0f;
             halfSizes.y = (maxAxes.y - minAxes.y) / 2.0f;
@@ -113,20 +111,26 @@ namespace Shapes
 
                 Gizmos.DrawLine(minCorner, minCorner + halfSizes.x * transform.right * 2);
                 Gizmos.DrawLine(minCorner, minCorner + halfSizes.z * transform.forward * 2);
-                Gizmos.DrawLine(minCorner + halfSizes.x * transform.right * 2, minCorner + (halfSizes.x * transform.right + halfSizes.z * transform.forward) * 2);
-                Gizmos.DrawLine(minCorner + halfSizes.z * transform.forward * 2, minCorner + (halfSizes.x * transform.right + halfSizes.z * transform.forward) * 2);
+                Gizmos.DrawLine(minCorner + halfSizes.x * transform.right * 2,
+                    minCorner + (halfSizes.x * transform.right + halfSizes.z * transform.forward) * 2);
+                Gizmos.DrawLine(minCorner + halfSizes.z * transform.forward * 2,
+                    minCorner + (halfSizes.x * transform.right + halfSizes.z * transform.forward) * 2);
 
                 Gizmos.DrawLine(minCorner, minCorner + halfSizes.y * transform.up * 2);
-                Gizmos.DrawLine(minCorner + halfSizes.x * transform.right * 2, minCorner + halfSizes.x * transform.right * 2 + halfSizes.y * transform.up * 2);
-                Gizmos.DrawLine(minCorner + halfSizes.z * transform.forward * 2, minCorner + halfSizes.z * transform.forward * 2 + halfSizes.y * transform.up * 2);
-                Gizmos.DrawLine(minCorner + (halfSizes.x * transform.right + halfSizes.z * transform.forward) * 2, minCorner + (halfSizes.x * transform.right + halfSizes.z * transform.forward) * 2 + halfSizes.y * transform.up * 2);
+                Gizmos.DrawLine(minCorner + halfSizes.x * transform.right * 2,
+                    minCorner + halfSizes.x * transform.right * 2 + halfSizes.y * transform.up * 2);
+                Gizmos.DrawLine(minCorner + halfSizes.z * transform.forward * 2,
+                    minCorner + halfSizes.z * transform.forward * 2 + halfSizes.y * transform.up * 2);
+                Gizmos.DrawLine(minCorner + (halfSizes.x * transform.right + halfSizes.z * transform.forward) * 2,
+                    minCorner + (halfSizes.x * transform.right + halfSizes.z * transform.forward) * 2 +
+                    halfSizes.y * transform.up * 2);
 
                 Gizmos.DrawLine(maxCorner, maxCorner - halfSizes.x * transform.right * 2);
                 Gizmos.DrawLine(maxCorner, maxCorner - halfSizes.z * transform.forward * 2);
-                Gizmos.DrawLine(maxCorner - halfSizes.x * transform.right * 2, maxCorner - (halfSizes.x * transform.right + halfSizes.z * transform.forward) * 2);
-                Gizmos.DrawLine(maxCorner - halfSizes.z * transform.forward * 2, maxCorner - (halfSizes.x * transform.right + halfSizes.z * transform.forward) * 2);
-
-
+                Gizmos.DrawLine(maxCorner - halfSizes.x * transform.right * 2,
+                    maxCorner - (halfSizes.x * transform.right + halfSizes.z * transform.forward) * 2);
+                Gizmos.DrawLine(maxCorner - halfSizes.z * transform.forward * 2,
+                    maxCorner - (halfSizes.x * transform.right + halfSizes.z * transform.forward) * 2);
             }
         }
 

@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using Shapes;
 using UnityEngine;
+using ContactPoint = Shapes.ContactPoint;
 
 [RequireComponent(typeof(MeshRenderer), typeof(MeshFilter))]
 public abstract class Collider : MonoBehaviour, ICollidable
@@ -31,5 +32,5 @@ public abstract class Collider : MonoBehaviour, ICollidable
         meshRenderer.material = value ? red : blue;
     }
 
-    public abstract bool IsColliding(Collider other);
+    public abstract bool IsColliding(Collider other, out List<ContactPoint> contactPoints);
 }

@@ -1,13 +1,10 @@
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.Globalization;
 using System.Linq;
 using Shapes;
 using UnityEngine;
-using Debug = UnityEngine.Debug;
-using Object = UnityEngine.Object;
 using Plane = Shapes.Plane;
+using ContactPoint = Shapes.ContactPoint;
 
 public class CollideManager : MonoBehaviour
 {
@@ -15,6 +12,7 @@ public class CollideManager : MonoBehaviour
 
     public const float Eps = 1e-3f;
     [SerializeField] private GameObject debugPoint;
+    [SerializeField] private bool debugContactPoints;
 
     public static CollideManager Instance { get; private set; }
     public GameObject DebugPoint => debugPoint;
@@ -37,8 +35,68 @@ public class CollideManager : MonoBehaviour
         print(debugPoint);
     }
 
-    public static bool SphereVsSphere(SphereCollider a, SphereCollider b)
+    public static bool HalfPlaneVsObject(Plane plane, PolygonCollider obj, out List<ContactPoint> contactPoints)
     {
+        contactPoints = new List<ContactPoint>();
+
+        Debug.Log($"{plane} collides with {obj}");
+        plane.Draw(Color.green);
+
+        foreach (var face in obj.Shape.Faces)
+        {
+            contactPoints.AddRange(GenerateContactPoints(plane, face)
+                .Select(pos => new ContactPoint(pos, plane.Normal)));
+        }
+
+        Debug.Log($"Found {contactPoints.Count} points");
+        foreach (var p in contactPoints)
+        {
+            var cp = Instantiate(Instance.DebugPoint, p.Point, Quaternion.identity);
+            cp.GetComponent<MeshRenderer>().material.color = Color.blue;
+            cp.transform.localScale *= 0.33f;
+            Destroy(cp, 0.05f);
+        }
+
+        return contactPoints.Count > 0;
+    }
+
+    // TODO solve this detection
+    public static bool HalfPlaneVsObject(Plane plane, SphereCollider obj, out List<ContactPoint> contactPoints)
+    {
+        contactPoints = null;
+        var p = obj.transform.position - plane.Normal;
+        var ep = Instantiate(Instance.DebugPoint, p, Quaternion.identity);
+        ep.GetComponent<MeshRenderer>().material.color = Color.green;
+        ep.transform.localScale *= 0.33f;
+        Destroy(ep, 0.05f);
+        
+        var vp = Instantiate(Instance.DebugPoint, obj.transform.position, Quaternion.identity);
+        vp.GetComponent<MeshRenderer>().material.color = Color.yellow;
+        vp.transform.localScale *= 0.33f;
+        Destroy(vp, 0.05f);
+
+        if (Intersect(obj.transform.position, p, plane, out var pos))
+        {
+            Debug.Log($"{plane} collides with {obj}");
+            plane.Draw(Color.green);
+
+            var cp = Instantiate(Instance.DebugPoint, pos, Quaternion.identity);
+            cp.GetComponent<MeshRenderer>().material.color = Color.blue;
+            cp.transform.localScale *= 0.33f;
+            Destroy(cp, 0.05f);
+
+            contactPoints = new List<ContactPoint> {new ContactPoint(pos, plane.Normal)};
+            return true;
+        }
+
+        return false;
+    }
+
+
+    public static bool SphereVsSphere(SphereCollider a, SphereCollider b, out List<ContactPoint> contactPoints)
+    {
+        contactPoints = null;
+
         Vector3 aCenter = a.Center;
         float aRadius = a.Radius;
 
@@ -47,11 +105,20 @@ public class CollideManager : MonoBehaviour
 
         // Calculate squared distance between centers
         Vector3 distance = aCenter - bCenter;
-        float dist2 = Vector3.Dot(distance, distance);
+        float dist2 = distance.sqrMagnitude;
 
         // Spheres intersect if squared distance is less than squared sum of radii
         float radiusSum = aRadius + bRadius;
-        return dist2 <= radiusSum * radiusSum;
+        var overlaping = dist2 <= radiusSum * radiusSum;
+
+        if (overlaping)
+        {
+            var point = (aCenter + bCenter) * 0.5f;
+            var penetration = Mathf.Abs((a.Center - point).magnitude);
+            contactPoints = new List<ContactPoint> {new ContactPoint(point, aCenter - point)};
+        }
+
+        return overlaping;
     }
 
     public static bool SphereVsOOB(SphereCollider a, PolygonCollider b)
@@ -174,7 +241,6 @@ public class CollideManager : MonoBehaviour
         var edgeB = halfEdgeB.Edge;
         var pointB = halfEdgeB.Vertex;
 
-        // if (Mathf.Abs(Mathf.Abs(Vector3.Dot(edgeA.normalized, edgeB.normalized)) - 1f) < Eps)
         if (Mathf.Abs(Vector3.Cross(edgeA, edgeB).magnitude) < Eps)
         {
             return float.MinValue;
@@ -188,18 +254,6 @@ public class CollideManager : MonoBehaviour
 
         return Vector3.Dot(normal, pointB - pointA);
     }
-
-    private static float Distance(HalfEdge a, HalfEdge b, Vector3 axis)
-    {
-        var ab = b.Transform.position - a.Transform.position;
-        var abProj = Vector3.Dot(ab, axis);
-
-        var aProj = Vector3.Dot(a.Vertex, axis);
-        var bProj = Vector3.Dot(b.Vertex, axis);
-
-        return abProj - (aProj + bProj) * 0.5f;
-    }
-
 
     private static (HalfEdge a, HalfEdge b, float distance) QueryEdgeDirection(PolygonCollider cubeA,
         PolygonCollider cubeB)
@@ -221,9 +275,6 @@ public class CollideManager : MonoBehaviour
                 if (BuildMinkowskiFace(halfEdgeA, halfEdgeB))
                 {
                     var separation = Distance(halfEdgeA, halfEdgeB, cubeA);
-                    // var separation = Distance(halfEdgeA, halfEdgeB,
-                    // Vector3.Cross(halfEdgeA.Edge, halfEdgeB.Edge).normalized);
-
                     // halfEdgeA.Draw(Color.Lerp(Color.red, Color.green, 1f / (separation * 10f + 1f)));
                     // halfEdgeB.Draw(Color.Lerp(Color.red, Color.green, 1f / (separation * 10f + 1f)));
 
@@ -234,15 +285,6 @@ public class CollideManager : MonoBehaviour
 
                         if (separation > 0f)
                         {
-                            // {
-                            //     var center = (halfEdgeA.Vertex + halfEdgeA.Twin.Vertex) * 0.5f;
-                            //     var n = Vector3.Cross(halfEdgeA.Edge, -halfEdgeB.Edge);
-                            //
-                            //     Debug.DrawLine(center, center + n, Color.magenta, 0.02f, false);
-                            // }
-                            // best.a.Draw(Color.Lerp(Color.red, Color.green, 1f / (separation * 10f + 1f)));
-                            // best.b.Draw(Color.Lerp(Color.red, Color.green, 1f / (separation * 10f + 1f)));
-                            Debug.Log($"DID {checks} CJECLS");
                             return best;
                         }
                     }
@@ -250,8 +292,6 @@ public class CollideManager : MonoBehaviour
             }
         }
 
-        Debug.Log($"DID {checks} CJECLS");
-        // Debug.LogWarning($"maximum separation: {best.separation.ToString(CultureInfo.InvariantCulture)}");
         return best;
     }
 
@@ -265,7 +305,6 @@ public class CollideManager : MonoBehaviour
 
         foreach (var faceA in facesA)
         {
-            // faceA.Draw(Color.cyan);
             var vertexB = cubeB.Shape.GetSupportPoint(-faceA.Normal);
             var distance = Vector3.Dot(faceA.Normal, vertexB - faceA.Points.First());
 
@@ -279,75 +318,54 @@ public class CollideManager : MonoBehaviour
         return best;
     }
 
-    public static bool OOBVsOOB(PolygonCollider cubeA, PolygonCollider cubeB, out List<Vector3> contactPoints)
+    public static bool OOBVsOOB(PolygonCollider a, PolygonCollider b, out List<ContactPoint> contactPoints)
     {
         contactPoints = null;
-        var faceQueryAb = QueryFaceDirection(cubeA, cubeB);
+        var faceQueryAb = QueryFaceDirection(a, b);
         if (faceQueryAb.distance > 0f)
         {
-            // Debug.Log($"Face Detection A->B <color=red>Failed</color>! Distance: {faceQueryAb.distance}");
             return false;
         }
 
-        var faceQueryBa = QueryFaceDirection(cubeB, cubeA);
+        var faceQueryBa = QueryFaceDirection(b, a);
         if (faceQueryBa.distance > 0f)
         {
-            // Debug.Log($"Face Detection B->A <color=red>Failed</color>! Distance: {faceQueryBa.distance}");
             return false;
         }
 
-        // // TODO Solve issues
-        var EdgeQuery = QueryEdgeDirection(cubeA, cubeB);
+        var EdgeQuery = QueryEdgeDirection(a, b);
         if (EdgeQuery.distance > 0f)
         {
-            Debug.LogWarning($"Edge Detection distance: {EdgeQuery.distance}");
             return false;
         }
 
-        Debug.LogWarning($"Edge Detection <color=green>PASSED!</color>");
-
-
-        // Debug.Log($"best separation {EdgeQuery.distance}");
-        contactPoints = new List<Vector3>();
+        contactPoints = new List<ContactPoint>();
 
         var x = Mathf.Abs(faceQueryAb.distance) < Mathf.Abs(faceQueryBa.distance);
 
         var distance = x ? Mathf.Abs(faceQueryAb.distance) : Mathf.Abs(faceQueryBa.distance);
         if (Mathf.Abs(EdgeQuery.distance) < Mathf.Abs(distance))
         {
-            Debug.Log($"Edge Detection on edges: {EdgeQuery.a}, {EdgeQuery.b}");
-            
             if (Intersect(EdgeQuery.a.Vertex, EdgeQuery.a.Twin.Vertex, EdgeQuery.b.Vertex, EdgeQuery.b.Twin.Vertex,
-                out var contactPoint))
+                out var pos))
             {
-                contactPoints.Add(contactPoint);
+                contactPoints.Add(new ContactPoint(pos, a.Center - pos));
             }
         }
         else
         {
             var referenceFace = x ? faceQueryAb.face : faceQueryBa.face;
-            var incidentFace = MostAntiParallelFace(x ? cubeB : cubeA, referenceFace);
-
-            {
-                referenceFace.Draw(Color.green);
-                // incidentFace.Draw();
-            }
+            var incidentFace = MostAntiParallelFace(x ? b : a, referenceFace);
 
             foreach (var sidePlane in referenceFace.SidePlanes)
             {
-                sidePlane.Draw(Color.yellow);
-
                 contactPoints.AddRange(GenerateContactPoints(sidePlane, incidentFace)
                     .Where(p => Vector3.Dot(p, referenceFace.Normal) > 0f &&
-                                Intersect(p, referenceFace))); // && Intersect(p, referenceFace)
+                                Intersect(p, referenceFace))
+                    .Select(pos => new ContactPoint(pos, a.Center - pos))); // && Intersect(p, referenceFace)
             }
         }
 
-        foreach (var point in contactPoints)
-        {
-            var cp = Instantiate(Instance.DebugPoint, point, Quaternion.identity);
-            Destroy(cp, 0.05f);
-        }
 
         return true;
     }
@@ -356,7 +374,7 @@ public class CollideManager : MonoBehaviour
 
     #region Sutherland-Hodgman clipping
 
-    public static bool Intersect(Vector3 a, Vector3 b, Vector3 c, Vector3 d,
+    private static bool Intersect(Vector3 a, Vector3 b, Vector3 c, Vector3 d,
         out Vector3 contactPoint)
     {
         // Algorithm is ported from the C algorithm of 
@@ -548,22 +566,32 @@ public class CollideManager : MonoBehaviour
         var sphereColliders = FindObjectsOfType<SphereCollider>().Where(sphereCollider =>
             polygonColliders.All(col => col.gameObject.GetInstanceID() != sphereCollider.gameObject.GetInstanceID()));
         colliders.AddRange(sphereColliders);
+
+        var halfPlanes = FindObjectsOfType<HalfPlaneCollider>();
+        colliders.AddRange(halfPlanes);
     }
 
     private void Update()
     {
         var others = new List<PolygonCollider>();
+
         foreach (var a in colliders)
         {
             var isColliding = false;
             others.Clear();
-            foreach (var b in colliders)
+            foreach (var b in colliders.Where(b => a.GetInstanceID() != b.GetInstanceID()))
             {
-                if (a.GetInstanceID() != b.GetInstanceID())
+                // TODO store (a, b) in a pair list as their collision has been computed 
+                // if (Dictionary.Contains(ab) || Dictionary.Contacins(ba)) continue;
+
+                if (!a.IsColliding(b, out var contactPoints)) continue;
+
+                isColliding = true;
+                if (debugContactPoints)
                 {
-                    if (a.IsColliding(b))
+                    foreach (var cp in contactPoints)
                     {
-                        isColliding = true;
+                        cp.Draw(Color.yellow);
                     }
                 }
             }
