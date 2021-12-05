@@ -85,12 +85,12 @@ namespace Shapes
 
             sb.AppendLine($"N: ({Normal.x:0.000}, {Normal.y:0.000}, {Normal.z:0.000})");
             sb.AppendLine($"Center: {center}");
-            sb.AppendLine("Points: ");
-
-            foreach (var edge in edges)
-            {
-                sb.Append($"{edge.Vertex}");
-            }
+            // sb.AppendLine("Points: ");
+            //
+            // foreach (var edge in edges)
+            // {
+            //     sb.Append($"{edge.Vertex}");
+            // }
 
             return sb.ToString();
         }

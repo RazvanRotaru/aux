@@ -62,7 +62,7 @@ public class CollideManager : MonoBehaviour
         float dist;
         Vector3 closestPt = new Vector3(0, 0, 0);
         dist = realCenter.x;
-        
+
         // X axis
         Vector3 halfSize = b.HalfSize;
         if (dist > halfSize.x)
@@ -74,6 +74,7 @@ public class CollideManager : MonoBehaviour
         {
             dist = -halfSize.x;
         }
+
         closestPt.x = dist;
 
         // Y axis
@@ -87,6 +88,7 @@ public class CollideManager : MonoBehaviour
         {
             dist = -halfSize.y;
         }
+
         closestPt.y = dist;
 
         // Z axis
@@ -100,6 +102,7 @@ public class CollideManager : MonoBehaviour
         {
             dist = -halfSize.z;
         }
+
         closestPt.z = dist;
 
         dist = Vector3.Distance(closestPt, realCenter);
@@ -132,8 +135,8 @@ public class CollideManager : MonoBehaviour
                     0.02f, false);
 
                 Debug.DrawLine(halfEdgeB.Transform.position + halfEdgeB.Transform.right * 0.05f,
-                    halfEdgeB.Transform.position + 1.5f * halfEdgeB.EdgeLocal, Color.white,
-                    0.02f, false);
+                    halfEdgeB.Transform.position + 1.5f * halfEdgeB.Edge + halfEdgeB.Transform.right * 0.05f,
+                    Color.white, 0.02f, false);
 
                 halfEdgeA.Draw(Color.blue);
                 var bxa = Vector3.Cross(normalA2, normalA1).normalized; //dc
@@ -141,7 +144,7 @@ public class CollideManager : MonoBehaviour
                     0.02f, false);
 
                 Debug.DrawLine(halfEdgeA.Transform.position + halfEdgeA.Transform.right * 0.05f,
-                    halfEdgeA.Transform.position + 1.5f * halfEdgeA.EdgeLocal, Color.white,
+                    halfEdgeA.Transform.position + 1.5f * halfEdgeA.Edge, Color.white,
                     0.02f, false);
                 aux = true;
             }
@@ -172,7 +175,7 @@ public class CollideManager : MonoBehaviour
         var pointB = halfEdgeB.Vertex;
 
         // if (Mathf.Abs(Mathf.Abs(Vector3.Dot(edgeA.normalized, edgeB.normalized)) - 1f) < Eps)
-        if (Vector3.Cross(edgeA, edgeB).magnitude < Eps)
+        if (Mathf.Abs(Vector3.Cross(edgeA, edgeB).magnitude) < Eps)
         {
             return float.MinValue;
         }
@@ -185,6 +188,18 @@ public class CollideManager : MonoBehaviour
 
         return Vector3.Dot(normal, pointB - pointA);
     }
+
+    private static float Distance(HalfEdge a, HalfEdge b, Vector3 axis)
+    {
+        var ab = b.Transform.position - a.Transform.position;
+        var abProj = Vector3.Dot(ab, axis);
+
+        var aProj = Vector3.Dot(a.Vertex, axis);
+        var bProj = Vector3.Dot(b.Vertex, axis);
+
+        return abProj - (aProj + bProj) * 0.5f;
+    }
+
 
     private static (HalfEdge a, HalfEdge b, float distance) QueryEdgeDirection(PolygonCollider cubeA,
         PolygonCollider cubeB)
@@ -206,6 +221,8 @@ public class CollideManager : MonoBehaviour
                 if (BuildMinkowskiFace(halfEdgeA, halfEdgeB))
                 {
                     var separation = Distance(halfEdgeA, halfEdgeB, cubeA);
+                    // var separation = Distance(halfEdgeA, halfEdgeB,
+                    // Vector3.Cross(halfEdgeA.Edge, halfEdgeB.Edge).normalized);
 
                     // halfEdgeA.Draw(Color.Lerp(Color.red, Color.green, 1f / (separation * 10f + 1f)));
                     // halfEdgeB.Draw(Color.Lerp(Color.red, Color.green, 1f / (separation * 10f + 1f)));
@@ -287,24 +304,26 @@ public class CollideManager : MonoBehaviour
             return false;
         }
 
+        Debug.LogWarning($"Edge Detection <color=green>PASSED!</color>");
+
 
         // Debug.Log($"best separation {EdgeQuery.distance}");
         contactPoints = new List<Vector3>();
 
         var x = Mathf.Abs(faceQueryAb.distance) < Mathf.Abs(faceQueryBa.distance);
 
-        // var distance = x ? Mathf.Abs(faceQueryAb.distance) : Mathf.Abs(faceQueryBa.distance);
-        // if (Mathf.Abs(EdgeQuery.distance) < Mathf.Abs(distance))
-        // {
-        //     Debug.Log($"Edge Detection on edges: {EdgeQuery.a}, {EdgeQuery.b}");
-        //     
-        //     if (Intersect(EdgeQuery.a.Vertex, EdgeQuery.a.Twin.Vertex, EdgeQuery.b.Vertex, EdgeQuery.b.Twin.Vertex,
-        //         out var contactPoint))
-        //     {
-        //         contactPoints.Add(contactPoint);
-        //     }
-        // }
-        // else
+        var distance = x ? Mathf.Abs(faceQueryAb.distance) : Mathf.Abs(faceQueryBa.distance);
+        if (Mathf.Abs(EdgeQuery.distance) < Mathf.Abs(distance))
+        {
+            Debug.Log($"Edge Detection on edges: {EdgeQuery.a}, {EdgeQuery.b}");
+            
+            if (Intersect(EdgeQuery.a.Vertex, EdgeQuery.a.Twin.Vertex, EdgeQuery.b.Vertex, EdgeQuery.b.Twin.Vertex,
+                out var contactPoint))
+            {
+                contactPoints.Add(contactPoint);
+            }
+        }
+        else
         {
             var referenceFace = x ? faceQueryAb.face : faceQueryBa.face;
             var incidentFace = MostAntiParallelFace(x ? cubeB : cubeA, referenceFace);

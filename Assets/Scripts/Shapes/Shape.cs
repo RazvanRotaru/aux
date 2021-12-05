@@ -1,3 +1,5 @@
+using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -19,14 +21,34 @@ public class Shape : MonoBehaviour
     [SerializeField] protected Vector3 spawnPoint;
     [SerializeField] protected DetailLevel details;
 
+    [SerializeField] private bool debugEdges = false;
+
     public List<HalfEdge> HalfEdges => MeshInfo.halfEdges;
     public List<Face> Faces => HalfEdges.Select(x => x.Face).Distinct().ToList();
+
+
+    private int index = 0;
 
     private void Awake()
     {
         if (GetComponents<Collider>().Length == 0)
         {
             gameObject.AddComponent<SphereCollider>();
+        }
+
+        index = 0;
+    }
+
+    private void Update()
+    {
+        if (!debugEdges) return;
+
+        HalfEdges[index].Draw(Color.cyan);
+        Debug.Log($"{HalfEdges[index]}");
+
+        if (Input.GetKeyDown(KeyCode.Space))
+        {
+            index = (index + 1) % HalfEdges.Count;
         }
     }
 
@@ -113,9 +135,9 @@ public class Shape : MonoBehaviour
         var halfEdges = new Dictionary<(int, int), HalfEdge>();
 
         // CCO
-        // var edgeIndices = new List<(int u, int v)> {(0, 2), (2, 1), (1, 0)};
+        var edgeIndices = new List<(int u, int v)> {(0, 2), (2, 1), (1, 0)};
 
-        var edgeIndices = new List<(int u, int v)> {(0, 1), (1, 2), (2, 0)};
+        // var edgeIndices = new List<(int u, int v)> {(0, 1), (1, 2), (2, 0)};
         var faces = new List<Face>();
 
         var indices = MeshInfo.indices;

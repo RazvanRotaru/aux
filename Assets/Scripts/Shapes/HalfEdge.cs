@@ -25,7 +25,7 @@ namespace Shapes
         public Vector3 VertexLocal => vertex;
 
         public Vector3 Edge => Transform.TransformDirection(EdgeLocal);
-        public Vector3 EdgeLocal => Next.Vertex - Vertex;
+        public Vector3 EdgeLocal => Twin.VertexLocal - VertexLocal;
 
         public HalfEdge(Transform transform, Vector3 vertex)
         {
@@ -35,7 +35,7 @@ namespace Shapes
 
         public override string ToString()
         {
-            return $"vert: {Vertex}, face: {Face}";
+            return $"vert: {Vertex}, face: {Face}, twinface: {Twin.Face}";
         }
 
         public void Draw(Color color)
@@ -44,7 +44,7 @@ namespace Shapes
             cp.GetComponent<MeshRenderer>().material.color = color;
             cp.transform.localScale *= 0.33f;
             Object.Destroy(cp, 0.05f);
-            
+
             var ep = Object.Instantiate(CollideManager.Instance.DebugPoint, Twin.Vertex, Quaternion.identity);
             ep.GetComponent<MeshRenderer>().material.color = Color.red;
             ep.transform.localScale *= 0.33f;
