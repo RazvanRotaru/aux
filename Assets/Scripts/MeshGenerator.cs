@@ -52,7 +52,7 @@ public static class MeshGenerator
         var counter = 0;
         const float radius = 1.0f;
 
-        while (angle < 2 * Mathf.PI)
+        while (angle < 2 * Mathf.PI - 0.001f)
         {
             _vertices.Add(ComputeCircleVertexPosition(angle, radius));
             angle += angleStep;
@@ -68,14 +68,23 @@ public static class MeshGenerator
 
     private static void GenerateCylinder(DetailLevel details)
     {
+        _vertices.Clear();
+        _indices.Clear();
         var distanceBetweenRings = DistanceBetweenElements(details);
         var height = (int) _size;
         float angle = 0;
+
+        Debug.Log($"Distance between rings {distanceBetweenRings}");
+
         var angleStep = Mathf.PI * (distanceBetweenRings * 0.25f);
         var counter = 0;
         const float radius = 1f;
 
-        while (angle < 2 * Mathf.PI)
+        Debug.Log(angleStep);
+        Debug.Log(2.0f * Mathf.PI);
+        Debug.Log(Mathf.PI / angleStep);
+
+        while (angle < 2.0f * Mathf.PI - 0.001f)
         {
             _vertices.Add(ComputeCircleVertexPosition(angle, radius));
             angle += angleStep;
@@ -83,7 +92,7 @@ public static class MeshGenerator
         }
 
         angle = 0;
-        while (angle < 2 * Mathf.PI)
+        while (angle < 2.0f * Mathf.PI - 0.001f)
         {
             _vertices.Add(ComputeCircleVertexPosition(angle, radius, height));
             angle += angleStep;
@@ -111,6 +120,7 @@ public static class MeshGenerator
             counter = 0;
             float alpha = 0;
 
+            // TODO: This might have the same bug as the above but it doesn't really matter for a sphere
             while (alpha < 2 * Mathf.PI)
             {
                 _vertices.Add(ComputeSphereVertexPosition(alpha, theta, radius));
