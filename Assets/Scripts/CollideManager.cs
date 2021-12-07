@@ -3,12 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using Shapes;
 using UnityEngine;
-using Plane = Shapes.Plane;
 using ContactPoint = Shapes.ContactPoint;
+using Plane = Shapes.Plane;
 
 public class CollideManager : MonoBehaviour
 {
-    private static bool aux = false;
+    private static bool _aux;
 
     public const float Eps = 1e-3f;
     [SerializeField] private GameObject debugPoint;
@@ -39,8 +39,8 @@ public class CollideManager : MonoBehaviour
     {
         contactPoints = new List<ContactPoint>();
 
-        Debug.Log($"{plane} collides with {obj}");
-        plane.Draw(Color.green);
+        // Debug.Log($"{plane} collides with {obj}");
+        // plane.Draw(Color.green);
 
         foreach (var face in obj.Shape.Faces)
         {
@@ -48,42 +48,38 @@ public class CollideManager : MonoBehaviour
                 .Select(pos => new ContactPoint(pos, plane.Normal)));
         }
 
-        Debug.Log($"Found {contactPoints.Count} points");
-        foreach (var p in contactPoints)
-        {
-            var cp = Instantiate(Instance.DebugPoint, p.Point, Quaternion.identity);
-            cp.GetComponent<MeshRenderer>().material.color = Color.blue;
-            cp.transform.localScale *= 0.33f;
-            Destroy(cp, 0.05f);
-        }
+        // Debug.Log($"Found {contactPoints.Count} points");
+        // foreach (var p in contactPoints)
+        // {
+        //     var cp = Instantiate(Instance.DebugPoint, p.Point, Quaternion.identity);
+        //     cp.GetComponent<MeshRenderer>().material.color = Color.blue;
+        //     cp.transform.localScale *= 0.33f;
+        //     Destroy(cp, 0.05f);
+        // }
 
         return contactPoints.Count > 0;
     }
 
-    // TODO solve this detection
     public static bool HalfPlaneVsObject(Plane plane, SphereCollider obj, out List<ContactPoint> contactPoints)
     {
         contactPoints = null;
-        var p = obj.transform.position - plane.Normal;
-        var ep = Instantiate(Instance.DebugPoint, p, Quaternion.identity);
-        ep.GetComponent<MeshRenderer>().material.color = Color.green;
-        ep.transform.localScale *= 0.33f;
-        Destroy(ep, 0.05f);
-        
-        var vp = Instantiate(Instance.DebugPoint, obj.transform.position, Quaternion.identity);
-        vp.GetComponent<MeshRenderer>().material.color = Color.yellow;
-        vp.transform.localScale *= 0.33f;
-        Destroy(vp, 0.05f);
+        var dir = Vector3.Dot(plane.Normal, (plane.Point - obj.Center).normalized) * plane.Normal;
+        var p = obj.Center + obj.Radius * dir;
 
-        if (Intersect(obj.transform.position, p, plane, out var pos))
+        var OA = obj.Center - plane.Point;
+        var OB = p - plane.Point;
+
+        // TODO: optimize or create specific method
+        if (Intersect(obj.transform.position, p, plane,
+            out var pos)) // Vector3.Dot(OA, plane.Normal) * Vector3.Dot(OB, plane.Normal) < 0f &&
         {
-            Debug.Log($"{plane} collides with {obj}");
-            plane.Draw(Color.green);
-
-            var cp = Instantiate(Instance.DebugPoint, pos, Quaternion.identity);
-            cp.GetComponent<MeshRenderer>().material.color = Color.blue;
-            cp.transform.localScale *= 0.33f;
-            Destroy(cp, 0.05f);
+            // Debug.Log($"{plane} collides with {obj}");
+            // plane.Draw(Color.green);
+            //
+            // var cp = Instantiate(Instance.DebugPoint, pos, Quaternion.identity);
+            // cp.GetComponent<MeshRenderer>().material.color = Color.blue;
+            // cp.transform.localScale *= 0.33f;
+            // Destroy(cp, 0.05f);
 
             contactPoints = new List<ContactPoint> {new ContactPoint(pos, plane.Normal)};
             return true;
@@ -191,31 +187,31 @@ public class CollideManager : MonoBehaviour
         var normalB1 = halfEdgeB.Twin.Face.Normal;
         var edgeB = halfEdgeB.Edge;
 
-        var dxc = Vector3.Cross(normalB2, normalB1).normalized; //dc
-        if (Vector3.Cross(dxc, edgeB.normalized).magnitude < Eps)
-        {
-            if (!aux)
-            {
-                Debug.Log($"Normal NOT OK: edge {edgeB} vs {dxc} for {normalB1} || {normalB2} ");
-                halfEdgeB.Draw(Color.blue);
-                Debug.DrawLine(halfEdgeB.Transform.position, halfEdgeB.Transform.position + 1.5f * dxc, Color.magenta,
-                    0.02f, false);
-
-                Debug.DrawLine(halfEdgeB.Transform.position + halfEdgeB.Transform.right * 0.05f,
-                    halfEdgeB.Transform.position + 1.5f * halfEdgeB.Edge + halfEdgeB.Transform.right * 0.05f,
-                    Color.white, 0.02f, false);
-
-                halfEdgeA.Draw(Color.blue);
-                var bxa = Vector3.Cross(normalA2, normalA1).normalized; //dc
-                Debug.DrawLine(halfEdgeA.Transform.position, halfEdgeA.Transform.position + 1.5f * bxa, Color.magenta,
-                    0.02f, false);
-
-                Debug.DrawLine(halfEdgeA.Transform.position + halfEdgeA.Transform.right * 0.05f,
-                    halfEdgeA.Transform.position + 1.5f * halfEdgeA.Edge, Color.white,
-                    0.02f, false);
-                aux = true;
-            }
-        }
+        // var dxc = Vector3.Cross(normalB2, normalB1).normalized; //dc
+        // if (Vector3.Cross(dxc, edgeB.normalized).magnitude < Eps)
+        // {
+        //     if (!aux)
+        //     {
+        //         Debug.Log($"Normal NOT OK: edge {edgeB} vs {dxc} for {normalB1} || {normalB2} ");
+        //         halfEdgeB.Draw(Color.blue);
+        //         Debug.DrawLine(halfEdgeB.Transform.position, halfEdgeB.Transform.position + 1.5f * dxc, Color.magenta,
+        //             0.02f, false);
+        //
+        //         Debug.DrawLine(halfEdgeB.Transform.position + halfEdgeB.Transform.right * 0.05f,
+        //             halfEdgeB.Transform.position + 1.5f * halfEdgeB.Edge + halfEdgeB.Transform.right * 0.05f,
+        //             Color.white, 0.02f, false);
+        //
+        //         halfEdgeA.Draw(Color.blue);
+        //         var bxa = Vector3.Cross(normalA2, normalA1).normalized; //dc
+        //         Debug.DrawLine(halfEdgeA.Transform.position, halfEdgeA.Transform.position + 1.5f * bxa, Color.magenta,
+        //             0.02f, false);
+        //
+        //         Debug.DrawLine(halfEdgeA.Transform.position + halfEdgeA.Transform.right * 0.05f,
+        //             halfEdgeA.Transform.position + 1.5f * halfEdgeA.Edge, Color.white,
+        //             0.02f, false);
+        //         aux = true;
+        //     }
+        // }
 
         return IsMinkowskiFace(normalA1, normalA2, -normalB1, -normalB2, edgeA, edgeB);
     }
@@ -263,7 +259,6 @@ public class CollideManager : MonoBehaviour
         // Debug.Log($"half edges for {cubeA}: {shapeA.Count}");
 
         (HalfEdge a, HalfEdge b, float separation) best = (null, null, float.MinValue);
-        var checks = 0;
         for (var indexA = 0; indexA < shapeA.Count; indexA += 2) // += 2
         {
             var halfEdgeA = cubeA.Shape.HalfEdges[indexA];
@@ -278,7 +273,6 @@ public class CollideManager : MonoBehaviour
                     // halfEdgeA.Draw(Color.Lerp(Color.red, Color.green, 1f / (separation * 10f + 1f)));
                     // halfEdgeB.Draw(Color.Lerp(Color.red, Color.green, 1f / (separation * 10f + 1f)));
 
-                    checks += 1;
                     if (separation > best.separation)
                     {
                         best = (halfEdgeA, halfEdgeB, separation);
@@ -351,21 +345,35 @@ public class CollideManager : MonoBehaviour
             {
                 contactPoints.Add(new ContactPoint(pos, a.Center - pos));
             }
+
+            Debug.LogWarning("EDGE CASE");
         }
         else
         {
             var referenceFace = x ? faceQueryAb.face : faceQueryBa.face;
             var incidentFace = MostAntiParallelFace(x ? b : a, referenceFace);
 
+            referenceFace.Draw(Color.green);
+            incidentFace.Draw(Color.red);
+
+            Debug.Log($"<color=green>{(x ? a : b)} ref face: {referenceFace}</color>");
+            Debug.Log($"<color=red>{(x ? b : a)} inc face: {incidentFace}</color>");
+
             foreach (var sidePlane in referenceFace.SidePlanes)
             {
                 contactPoints.AddRange(GenerateContactPoints(sidePlane, incidentFace)
-                    .Where(p => Vector3.Dot(p, referenceFace.Normal) > 0f &&
-                                Intersect(p, referenceFace))
-                    .Select(pos => new ContactPoint(pos, a.Center - pos))); // && Intersect(p, referenceFace)
+                    .Where(p => Vector3.Dot(p - referenceFace.Center, referenceFace.Normal) <
+                        0f && Intersect(p, referenceFace)) //
+                    .Select(pos => new ContactPoint(pos, a.Center - pos)));
             }
+
+            Debug.LogWarning("FACE CASE");
         }
 
+        if (contactPoints.Count == 0)
+        {
+            Debug.LogError($"NO CONTACT POINT DETECTED FOR {a}");
+        }
 
         return true;
     }
@@ -382,15 +390,15 @@ public class CollideManager : MonoBehaviour
         contactPoint = Vector3.negativeInfinity;
 
         var ca = a - c;
-
         var cd = d - c;
-        if (cd.sqrMagnitude < Eps)
+
+        if (cd.sqrMagnitude < 0f)
         {
             return false;
         }
 
         var ab = b - a;
-        if (ab.sqrMagnitude < Eps)
+        if (ab.sqrMagnitude < 0f)
         {
             return false;
         }
@@ -402,7 +410,7 @@ public class CollideManager : MonoBehaviour
         var d2121 = ab.x * ab.x + ab.y * ab.y + ab.z * ab.z;
 
         var denom = d2121 * d4343 - d4321 * d4321;
-        if (Mathf.Abs(denom) < Eps)
+        if (Mathf.Abs(denom) < 1e-8f)
         {
             return false;
         }
@@ -410,14 +418,16 @@ public class CollideManager : MonoBehaviour
         var numer = d1343 * d4321 - d1321 * d4343;
 
         var mua = numer / denom;
-        if (mua < 0f || mua >= 1f)
+        if (mua < Eps || mua >= 1f + Eps)
         {
+            Debug.Log("asta o fi");
             return false;
         }
 
         var mub = (d1343 + d4321 * mua) / d4343;
-        if (mub < 0f || mub >= 1f)
+        if (mub < Eps || mub >= 1f + Eps)
         {
+            Debug.Log("sau asta");
             return false;
         }
 
@@ -431,37 +441,39 @@ public class CollideManager : MonoBehaviour
 
     private static bool Intersect(Vector3 point, Face face)
     {
-        if (Vector3.Dot((face.Center - point).normalized, -face.Normal) > Eps)
-        {
-            return false;
-        }
+        // if (Vector3.Dot((face.Center - point).normalized, -face.Normal) > Eps)
+        // {
+        //     return false;
+        // }
 
-        {
-            var cp = Instantiate(Instance.DebugPoint, point, Quaternion.identity);
-            cp.GetComponent<MeshRenderer>().material.color = Color.green;
-            cp.transform.localScale *= 0.75f;
-            Destroy(cp, 0.05f);
-        }
+        // {
+        //     var cp = Instantiate(Instance.DebugPoint, point, Quaternion.identity);
+        //     cp.GetComponent<MeshRenderer>().material.color = Color.green;
+        //     cp.transform.localScale *= 0.33f;
+        //     Destroy(cp, 0.05f);
+        // }
 
         var intersections = 0;
 
-        point -= Vector3.Dot(point - face.Center, face.Normal) * face.Normal;
-        {
-            var cp = Instantiate(Instance.DebugPoint, point, Quaternion.identity);
-            cp.GetComponent<MeshRenderer>().material.color = Color.blue;
-            cp.transform.localScale *= 0.5f;
-            Destroy(cp, 0.05f);
-        }
+        var pc = point - face.Center;
+        point -= Vector3.Dot(pc, face.Normal) * face.Normal;
+        point -= pc * 0.01f;
+        // {
+        //     var cp = Instantiate(Instance.DebugPoint, point, Quaternion.identity);
+        //     cp.GetComponent<MeshRenderer>().material.color = Color.blue;
+        //     cp.transform.localScale *= 0.5f;
+        //     Destroy(cp, 0.05f);
+        // }
         var dir = (face.Center - point).normalized;
 
 
         var p0 = point + dir * 100f;
-        Debug.DrawLine(point, p0, Color.blue, 0.02f, false);
+        // Debug.DrawLine(point, p0, Color.blue, 0.02f, false);
 
         var a = face.Points.Last();
         foreach (var b in face.Points)
         {
-            if (Intersect(point, p0, a, b, out var contact))
+            if (Intersect(point, p0, a, b, out _))
             {
                 intersections += 1;
             }
@@ -477,12 +489,25 @@ public class CollideManager : MonoBehaviour
         point = Vector3.negativeInfinity;
         var ab = b - a;
         var dot = Vector3.Dot(plane.Normal, ab.normalized);
-        if (Mathf.Abs(dot) < Eps)
+
+        // TODO this not might be correct
+        // if (Mathf.Abs(dot) < Eps)
+        // {
+        //     return false;
+        // }
+
+        if (dot == 0f)
         {
             return false;
         }
 
         var t = (Vector3.Dot(plane.Normal, plane.Point) - Vector3.Dot(plane.Normal, a)) / dot;
+
+        if (t < -Eps || t > 1f + Eps)
+        {
+            return false;
+        }
+
         point = a + ab.normalized * t;
         return true;
     }
@@ -491,9 +516,13 @@ public class CollideManager : MonoBehaviour
     {
         const int inFront = 1;
         const int behind = -1;
+        const int on = 0;
 
         Func<Vector3, int> planeSide = point =>
-            Vector3.Dot(point - plane.Point, plane.Normal) > 0 ? inFront : behind;
+        {
+            var dot = Vector3.Dot(point - plane.Point, plane.Normal);
+            return Mathf.Abs(dot) < 1e-2f ? on : dot > 0f ? inFront : behind;
+        };
 
 
         var points = new List<Vector3>();
@@ -505,25 +534,37 @@ public class CollideManager : MonoBehaviour
         {
             var bSide = planeSide(b);
 
-            if (aSide == behind && bSide == inFront)
+            switch (aSide)
             {
-                if (Intersect(a, b, plane, out var contactPoint))
+                case behind when bSide == inFront:
                 {
-                    points.Add(contactPoint);
-                }
-            }
-            else if (aSide == inFront && bSide == behind)
-            {
-                if (Intersect(a, b, plane, out var contactPoint))
-                {
-                    points.Add(contactPoint);
-                }
+                    if (Intersect(a, b, plane, out var contactPoint))
+                    {
+                        points.Add(contactPoint);
+                    }
 
-                points.Add(b);
-            }
-            else if (aSide == behind && bSide == behind)
-            {
-                points.Add(b);
+                    break;
+                }
+                case behind when bSide == on:
+                    points.Add(b);
+                    break;
+                case inFront when bSide == behind:
+                {
+                    if (Intersect(a, b, plane, out var contactPoint))
+                    {
+                        points.Add(contactPoint);
+                    }
+
+                    points.Add(b);
+                    break;
+                }
+                case on when bSide == behind:
+                    points.Add(a);
+                    points.Add(b);
+                    break;
+                case behind when bSide == behind:
+                    points.Add(b);
+                    break;
             }
 
             a = b;
@@ -557,6 +598,11 @@ public class CollideManager : MonoBehaviour
     /// (return the bounding vertexes on creation)
     [SerializeField] private List<Collider> colliders;
 
+    static CollideManager()
+    {
+        _aux = false;
+    }
+
     private void Start()
     {
         // colliders = new List<Collider>(FindObjectsOfType<PolygonCollider>());
@@ -587,7 +633,7 @@ public class CollideManager : MonoBehaviour
                 if (!a.IsColliding(b, out var contactPoints)) continue;
 
                 isColliding = true;
-                if (debugContactPoints)
+                if (debugContactPoints && contactPoints != null)
                 {
                     foreach (var cp in contactPoints)
                     {
@@ -603,6 +649,6 @@ public class CollideManager : MonoBehaviour
             a.Collides(isColliding);
         }
 
-        aux = false;
+        _aux = false;
     }
 }

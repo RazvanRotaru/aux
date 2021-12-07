@@ -35,6 +35,11 @@ namespace Shapes
             normal = Vector3.Cross(ab, ac).normalized;
             if (Vector3.Dot(normal, a) < 0) normal *= -1;
 
+            if (normal.magnitude == 0)
+            {
+                Debug.LogError($"WTF: {a}. {b}. {c}");
+            } 
+            
             HalfEdge = halfEdge;
 
             sidePlanes = new List<Plane>();

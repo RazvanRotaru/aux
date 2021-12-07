@@ -60,7 +60,7 @@ namespace Shapes
 
             for (int i = 1; i < vertices.Length; ++i)
             {
-                Debug.Log(vertices[i].y);
+                // Debug.Log(vertices[i].y);
 
                 minAxes.x = minAxes.x > vertices[i].x ? vertices[i].x : minAxes.x;
                 minAxes.y = minAxes.y > vertices[i].y ? vertices[i].y : minAxes.y;

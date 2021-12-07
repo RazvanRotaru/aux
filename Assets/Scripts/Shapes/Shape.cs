@@ -135,9 +135,9 @@ public class Shape : MonoBehaviour
         var halfEdges = new Dictionary<(int, int), HalfEdge>();
 
         // CCO
-        var edgeIndices = new List<(int u, int v)> {(0, 2), (2, 1), (1, 0)};
+        // var edgeIndices = new List<(int u, int v)> {(0, 2), (2, 1), (1, 0)};
 
-        // var edgeIndices = new List<(int u, int v)> {(0, 1), (1, 2), (2, 0)};
+        var edgeIndices = new List<(int u, int v)> {(0, 1), (1, 2), (2, 0)};
         var faces = new List<Face>();
 
         var indices = MeshInfo.indices;
