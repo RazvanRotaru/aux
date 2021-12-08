@@ -45,7 +45,8 @@ public class CollideManager : MonoBehaviour
         foreach (var face in obj.Shape.Faces)
         {
             contactPoints.AddRange(GenerateContactPoints(plane, face)
-                .Select(pos => new ContactPoint(pos, plane.Normal)));
+                .Select(pos => new ContactPoint(pos, plane.Normal,
+                    Mathf.Abs(Vector3.Dot(pos - plane.Point, plane.Normal)))));
         }
 
         // Debug.Log($"Found {contactPoints.Count} points");
@@ -81,7 +82,11 @@ public class CollideManager : MonoBehaviour
             // cp.transform.localScale *= 0.33f;
             // Destroy(cp, 0.05f);
 
-            contactPoints = new List<ContactPoint> {new ContactPoint(pos, plane.Normal)};
+            contactPoints = new List<ContactPoint>
+            {
+                new ContactPoint(pos, plane.Normal,
+                    Mathf.Abs(Vector3.Dot(pos - plane.Point, plane.Normal)))
+            };
             return true;
         }
 
@@ -111,7 +116,10 @@ public class CollideManager : MonoBehaviour
         {
             var point = (aCenter + bCenter) * 0.5f;
             var penetration = Mathf.Abs((a.Center - point).magnitude);
-            contactPoints = new List<ContactPoint> {new ContactPoint(point, aCenter - point)};
+            contactPoints = new List<ContactPoint>
+            {
+                new ContactPoint(point, aCenter - point, aRadius - (aCenter - point).magnitude)
+            };
         }
 
         return overlaping;
@@ -343,7 +351,7 @@ public class CollideManager : MonoBehaviour
             if (Intersect(EdgeQuery.a.Vertex, EdgeQuery.a.Twin.Vertex, EdgeQuery.b.Vertex, EdgeQuery.b.Twin.Vertex,
                 out var pos))
             {
-                contactPoints.Add(new ContactPoint(pos, a.Center - pos));
+                contactPoints.Add(new ContactPoint(pos, a.Center - pos, distance));
             }
 
             Debug.LogWarning("EDGE CASE");
@@ -364,7 +372,7 @@ public class CollideManager : MonoBehaviour
                 contactPoints.AddRange(GenerateContactPoints(sidePlane, incidentFace)
                     .Where(p => Vector3.Dot(p - referenceFace.Center, referenceFace.Normal) <
                         0f && Intersect(p, referenceFace)) //
-                    .Select(pos => new ContactPoint(pos, a.Center - pos)));
+                    .Select(pos => new ContactPoint(pos, a.Center - pos, EdgeQuery.distance)));
             }
 
             Debug.LogWarning("FACE CASE");

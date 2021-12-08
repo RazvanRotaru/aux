@@ -6,11 +6,13 @@ namespace Shapes
     {
         public Vector3 Point;
         public Vector3 Normal;
+        public float Penetration;
 
-        public ContactPoint(Vector3 point, Vector3 normal)
+        public ContactPoint(Vector3 point, Vector3 normal, float penetration)
         {
             Point = point;
             Normal = normal;
+            Penetration = penetration;
         }
 
         public void Draw(Color color)
