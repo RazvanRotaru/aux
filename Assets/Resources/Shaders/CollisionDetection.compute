@@ -1,4 +1,4 @@
-﻿#pragma kernel PolygonVsPolygon
+﻿#pragma kernel CollisionDetection
 // #pragma kernel SphereVsSphere
 
 #include "HalfEdge.hlsl"
@@ -23,27 +23,27 @@ RWStructuredBuffer<float3> points;
 
 RWStructuredBuffer<float2> collisions;
 
-float3 SupportPoint(Shape shape, float3 dir)
+float3 SupportPoint(const Shape shape, const float3 dir)
 {
-    uint points_offset = shape.pointInfo[OFFSET];
-    uint points_num = shape.pointInfo[NUM];
+    const uint points_offset = shape.pointInfo[OFFSET];
+    const uint points_num = shape.pointInfo[NUM];
 
-    float bestProjection = -NA;
-    float3 bestVert;
+    float best_projection = -NA;
+    float3 best_vert;
 
     for (uint i = points_offset; i < points_offset + points_num; i++)
     {
-        float3 vert = mul(shape.R, float4(points[i], 1)).xyz;
-        float projection = dot(vert, dir);
+        const float3 vert = mul(shape.R, float4(points[i], 1)).xyz;
+        const float projection = dot(vert, dir);
 
-        if (projection > bestProjection)
+        if (projection > best_projection)
         {
-            bestProjection = projection;
-            bestVert = vert;
+            best_projection = projection;
+            best_vert = vert;
         }
     }
 
-    return mul(shape.T, float4(bestVert, 1)).xyz;
+    return mul(shape.T, float4(best_vert, 1)).xyz;
 }
 
 float QueryFace(const uint a_id, const uint b_id, out int face_id)
@@ -51,37 +51,38 @@ float QueryFace(const uint a_id, const uint b_id, out int face_id)
     const uint faces_off = faceInfo[a_id][OFFSET];
     const uint faces_num = faceInfo[a_id][NUM];
 
-    Shape shape = shapes[b_id];
-    float bestDistance = -NA;
+    const Shape shape = shapes[b_id];
+    float best_distance = -NA;
 
     for (uint i = faces_off; i < faces_off + faces_num; i++)
     {
-        Face curr_face = faces[i];
-        float3 supportPoint = SupportPoint(shape, -curr_face.normal);
+        const Face curr_face = faces[i];
+        const float3 supportPoint = SupportPoint(shape, -curr_face.normal);
 
-        float distance = dot(curr_face.normal, supportPoint - curr_face.center);
+        const float distance = dot(curr_face.normal, supportPoint - curr_face.center);
 
-        if (distance > bestDistance)
+        if (distance > best_distance)
         {
-            bestDistance = distance;
+            best_distance = distance;
             face_id = i;
         }
     }
 
-    return bestDistance;
+    return best_distance;
 }
 
-bool IsMinkowskiFace(float3 a, float3 b, float3 c, float3 d, float3 bxa, float3 dxc)
+bool IsMinkowskiFace(const float3 a, const float3 b, const float3 c, const float3 d, const float3 bxa,
+                     const float3 dxc)
 {
-    float cba = dot(c, bxa);
-    float dba = dot(d, bxa);
-    float adc = dot(a, dxc);
-    float bdc = dot(b, dxc);
+    const float cba = dot(c, bxa);
+    const float dba = dot(d, bxa);
+    const float adc = dot(a, dxc);
+    const float bdc = dot(b, dxc);
 
     return (cba * dba < 0.0f) && (adc * bdc < 0.0f) && (cba * bdc > 0.0f);
 }
 
-bool BuildMinkowskiFace(HalfEdge he_a, HalfEdge he_b)
+bool BuildMinkowskiFace(const HalfEdge he_a, const HalfEdge he_b)
 {
     return IsMinkowskiFace(he_a.n1, he_a.n2, -he_b.n1, -he_b.n2, he_a.edge, he_b.edge);
 }
@@ -99,24 +100,24 @@ float Distance(const HalfEdge he_a, const HalfEdge he_b)
 
 float QueryEdge(uint a_id, uint b_id, out uint edgeA, out uint edgeB)
 {
-    uint a_he_start = halfedgeInfo[a_id][OFFSET];
-    uint a_he_end = a_he_start + halfedgeInfo[a_id][NUM];
-    uint b_he_start = halfedgeInfo[b_id][OFFSET];
-    uint b_he_end = b_he_start + halfedgeInfo[b_id][NUM];
+    const uint a_he_start = halfedgeInfo[a_id][OFFSET];
+    const uint a_he_end = a_he_start + halfedgeInfo[a_id][NUM];
+    const uint b_he_start = halfedgeInfo[b_id][OFFSET];
+    const uint b_he_end = b_he_start + halfedgeInfo[b_id][NUM];
 
     int count = 100;
     for (uint i = a_he_start; i < a_he_end; i += 1)
     {
-        HalfEdge he_a = halfedges[i];
+        const HalfEdge he_a = halfedges[i];
 
         for (uint j = b_he_start; j < b_he_end; j += 1)
         {
-            HalfEdge he_b = halfedges[j];
+            const HalfEdge he_b = halfedges[j];
             count += 1;
 
             if (!BuildMinkowskiFace(he_a, he_b)) continue;
 
-            float separation = Distance(he_a, he_b);
+            const float separation = Distance(he_a, he_b);
             if (separation > 0)
             {
                 edgeA = i;
@@ -131,9 +132,36 @@ float QueryEdge(uint a_id, uint b_id, out uint edgeA, out uint edgeB)
     return -count;
 }
 
+bool PolygonVsPolygon(const int id, const int other_id)
+{
+    uint face_a = 0;
+    const float dist_ab = QueryFace(id, other_id, face_a);
+    if (dist_ab > 0.0f)
+    {
+        return false;
+    }
+
+    uint face_b = 0;
+    const float dist_ba = QueryFace(other_id, id, face_b);
+    if (dist_ba > 0.0f)
+    {
+        return false;
+    }
+
+
+    uint edge_a = 0, edge_b = 0;
+    const float dist_edge = QueryEdge(id, other_id, edge_a, edge_b);
+    if (dist_edge > 0.0f)
+    {
+        return false;
+    }
+
+    return true;
+}
+
 
 [numthreads(32, 32, 1)]
-void PolygonVsPolygon(uint3 gid: SV_DispatchThreadID)
+void CollisionDetection(uint3 gid: SV_DispatchThreadID)
 {
     if (gid.x >= objectsNo || gid.y >= objectsNo)
     {
@@ -142,36 +170,12 @@ void PolygonVsPolygon(uint3 gid: SV_DispatchThreadID)
     const int id = gid.x;
     const int other_id = gid.y;
 
-    int index = id * objectsNo + other_id;
+    const int index = id * objectsNo + other_id;
+    collisions[index] = float2(-99, -99);
 
-    collisions[index] = float2(-100 - id, -100 - other_id);
     if (other_id == id || length(collisions[index]) <= 0) return;
-    collisions[index] = float2(-500 - id, -500 - other_id);
 
-    uint faceA = 0;
-    float distAB = QueryFace(id, other_id, faceA);
-    if (distAB > 0.0f)
-    {
-        collisions[index] = float2(-1, distAB);
-        return;
-    }
-
-    uint faceB = 0;
-    float distBA = QueryFace(other_id, id, faceB);
-    if (distBA > 0.0f)
-    {
-        collisions[index] = float2(-2, distBA);
-        return;
-    }
-
-
-    uint edgeA = 0, edgeB = 0;
-    float distEdge = QueryEdge(id, other_id, edgeA, edgeB);
-    if (distEdge > 0.0f)
-    {
-        collisions[index] = float2(-3, distEdge);
-        return;
-    }
+    if (!PolygonVsPolygon(id, other_id)) return;
 
     collisions[index] = float2(id, other_id);
 }

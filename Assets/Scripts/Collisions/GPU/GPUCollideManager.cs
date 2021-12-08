@@ -96,7 +96,7 @@ namespace Collisions.GPU
         private void Start()
         {
             detectionLogic = Resources.Load<ComputeShader>("Shaders/CollisionDetection");
-            kDetect = new Kernel(detectionLogic, "PolygonVsPolygon");
+            kDetect = new Kernel(detectionLogic, "CollisionDetection");
 
             var polygonColliders = FindObjectsOfType<Cube>();
             colliders.AddRange(polygonColliders);
