@@ -17,7 +17,7 @@ public class Shape : MonoBehaviour
     [SerializeField] private Material red;
     [SerializeField] private Material blue;
     [SerializeField] private Material yellow;
-    [SerializeField] protected MeshStruct MeshInfo;
+    [SerializeField] public MeshStruct MeshInfo;
     [SerializeField] protected Vector3 spawnPoint;
     [SerializeField] protected DetailLevel details;
 

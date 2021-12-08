@@ -420,14 +420,12 @@ public class CollideManager : MonoBehaviour
         var mua = numer / denom;
         if (mua < Eps || mua >= 1f + Eps)
         {
-            Debug.Log("asta o fi");
             return false;
         }
 
         var mub = (d1343 + d4321 * mua) / d4343;
         if (mub < Eps || mub >= 1f + Eps)
         {
-            Debug.Log("sau asta");
             return false;
         }
 

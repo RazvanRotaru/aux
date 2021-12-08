@@ -38,8 +38,8 @@ namespace Shapes
             if (normal.magnitude == 0)
             {
                 Debug.LogError($"WTF: {a}. {b}. {c}");
-            } 
-            
+            }
+
             HalfEdge = halfEdge;
 
             sidePlanes = new List<Plane>();
@@ -107,7 +107,7 @@ namespace Shapes
 
         public bool Equals(Face other)
         {
-            return Vector3.Dot(Normal, other.Normal) > 1f - CollideManager.Eps;
+            return Vector3.Dot(Normal, other.Normal) > 1f - 1e-6f;
         }
     }
 }

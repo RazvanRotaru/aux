@@ -40,19 +40,19 @@ namespace Shapes
 
         public void Draw(Color color)
         {
-            var cp = Object.Instantiate(CollideManager.Instance.DebugPoint, Vertex, Quaternion.identity);
-            cp.GetComponent<MeshRenderer>().material.color = color;
-            cp.transform.localScale *= 0.33f;
-            Object.Destroy(cp, 0.05f);
-
-            var ep = Object.Instantiate(CollideManager.Instance.DebugPoint, Twin.Vertex, Quaternion.identity);
-            ep.GetComponent<MeshRenderer>().material.color = Color.red;
-            ep.transform.localScale *= 0.33f;
-            Object.Destroy(ep, 0.05f);
-
-            Debug.DrawLine(Vertex, Vertex + EdgeLocal * 1.25f, color, 0.02f, false);
-            Face.Draw(Color.green);
-            Twin.Face.Draw(Color.red);
+            // var cp = Object.Instantiate(CollideManager.Instance.DebugPoint, Vertex, Quaternion.identity);
+            // cp.GetComponent<MeshRenderer>().material.color = color;
+            // cp.transform.localScale *= 0.33f;
+            // Object.Destroy(cp, 0.05f);
+            //
+            // var ep = Object.Instantiate(CollideManager.Instance.DebugPoint, Twin.Vertex, Quaternion.identity);
+            // ep.GetComponent<MeshRenderer>().material.color = Color.red;
+            // ep.transform.localScale *= 0.33f;
+            // Object.Destroy(ep, 0.05f);
+            //
+            // Debug.DrawLine(Vertex, Vertex + EdgeLocal * 1.25f, color, 0.02f, false);
+            // Face.Draw(Color.green);
+            // Twin.Face.Draw(Color.red);
         }
     }
 }

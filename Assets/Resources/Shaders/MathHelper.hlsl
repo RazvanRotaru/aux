@@ -1,0 +1,1 @@
+﻿// TODO: move dot, cross and distance helper functions here
