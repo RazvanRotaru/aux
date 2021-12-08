@@ -4,8 +4,7 @@
 struct Shape
 {
     uint2 pointInfo;
-
-    float3 center;
+    bool isSphere;
     float radius;
 };
 

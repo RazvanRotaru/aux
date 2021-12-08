@@ -16,6 +16,8 @@ public abstract class Collider : MonoBehaviour, ICollidable
     [SerializeField] protected Material blue;
     [SerializeField] protected Material yellow;
 
+    public Shape Shape => shape;
+    
     protected virtual void Awake()
     {
         meshRenderer = GetComponent<MeshRenderer>();

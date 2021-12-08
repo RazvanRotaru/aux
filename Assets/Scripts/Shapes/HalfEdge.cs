@@ -21,7 +21,23 @@ namespace Shapes
             set => face = value;
         }
 
-        public Vector3 Vertex => Transform.TransformPoint(vertex); // The origin vertex of this half-edge
+        public Vector3 Vertex
+        {
+            get
+            {
+                try
+                {
+                    return Transform.TransformPoint(vertex);
+                    // The origin vertex of this half-edge
+                }
+                catch
+                {
+                    Debug.Log($"something is fishy with {Transform} and {vertex}");
+                    return Vector3.down;
+                }
+            }
+        }
+
         public Vector3 VertexLocal => vertex;
 
         public Vector3 Edge => Transform.TransformDirection(EdgeLocal);
@@ -30,6 +46,11 @@ namespace Shapes
         public HalfEdge(Transform transform, Vector3 vertex)
         {
             Transform = transform;
+            if (transform == null)
+            {
+                Debug.Log("trasnform is null");
+            }
+
             this.vertex = vertex;
         }
 

@@ -149,11 +149,13 @@ public class Shape : MonoBehaviour
             var a = indices[i];
             var b = indices[i + 1];
             var c = indices[i + 2];
+
             var triangle = new List<int> {a, b, c};
 
             foreach (var (u, v) in edgeIndices)
             {
                 var edge = (u: triangle[u], v: triangle[v]);
+                
                 var halfEdge = new HalfEdge(transform, vertices[edge.u]);
                 halfEdges[edge] = halfEdge;
                 var face = new Face(halfEdge, vertices[a], vertices[b], vertices[c]);
@@ -218,7 +220,7 @@ public class Shape : MonoBehaviour
 
         var edges = sortedHalfEdges.Where(x => x.Face.Normal != Vector3.zero).ToList();
 
-        Debug.Log($"Generated {edges.Count} edges and {faces.Count} faces");
+        Debug.Log($"<color=orange>Generated {edges.Count} edges and {faces.Count} faces</color>");
         return edges;
     }
 }

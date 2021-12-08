@@ -18,6 +18,8 @@ public class SphereCollider : Collider
         base.Awake();
         Debug.Assert(meshFilter.mesh.vertices.Length > 0, "Cannot generate collider from empty mesh!");
 
+        Shape.HalfEdges.ForEach(he => Debug.Assert(he.Transform != null, "A halfedges transform reference is null"));
+
         ComputeRadiusFromMesh(meshFilter.mesh.vertices);
     }
 

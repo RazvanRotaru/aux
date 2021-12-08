@@ -25,7 +25,7 @@ RWStructuredBuffer<TransformMat> mat;
 
 RWStructuredBuffer<float2> collisions;
 
-float3 SupportPoint(const Shape shape, const float3 dir, const float4x4 r, const float4x4 t)
+float3 SupportPoint(const Shape shape, const float3 dir, const float4x4 r, const float3 t)
 {
     const uint points_offset = shape.pointInfo[OFFSET];
     const uint points_num = shape.pointInfo[NUM];
@@ -45,7 +45,7 @@ float3 SupportPoint(const Shape shape, const float3 dir, const float4x4 r, const
         }
     }
 
-    return mul(t, float4(best_vert, 1)).xyz;
+    return t + best_vert;
 }
 
 float QueryFace(const uint a_id, const uint b_id, out int face_id)
@@ -55,7 +55,7 @@ float QueryFace(const uint a_id, const uint b_id, out int face_id)
 
     const Shape shape = shapes[b_id];
     const float4x4 R = mat[b_id].R;
-    const float4x4 T = mat[b_id].T;
+    const float3 T = mat[b_id].T;
 
     float best_distance = -NA;
 
@@ -164,6 +164,34 @@ bool PolygonVsPolygon(const int id, const int other_id)
     return true;
 }
 
+bool SphereVsSphere(const int id, const int other_id)
+{
+    Shape a = shapes[id];
+    Shape b = shapes[other_id];
+
+    const float3 a_center = mat[id].T;
+    const float3 b_center = mat[other_id].T;
+    const float dist = distance(a_center, b_center);
+    const float radii_sum = a.radius + b.radius;
+
+    float diff = dist - radii_sum;
+
+    const bool overlapping = diff <= 0.0f;
+
+    if (overlapping)
+    {
+        // TODO create contact point
+    }
+
+    if (! overlapping)
+    {
+        const int index = id * objectsNo + other_id;
+        collisions[index] = float2(-60 - id, diff);
+    }
+
+    return overlapping;
+}
+
 
 [numthreads(32, 32, 1)]
 void CollisionDetection(uint3 gid: SV_DispatchThreadID)
@@ -179,6 +207,13 @@ void CollisionDetection(uint3 gid: SV_DispatchThreadID)
     collisions[index] = float2(-99, -99);
 
     if (other_id == id || length(collisions[index]) <= 0) return;
+
+    if (!SphereVsSphere(id, other_id)) return;
+    if (shapes[id].isSphere == 1)
+    {
+        collisions[index] = float2(id, -other_id);
+        return;
+    }
 
     if (!PolygonVsPolygon(id, other_id)) return;
 

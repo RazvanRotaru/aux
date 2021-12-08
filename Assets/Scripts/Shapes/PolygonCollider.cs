@@ -15,8 +15,6 @@ namespace Shapes
 
         public SphereCollider SphereCollider { get; private set; }
 
-        public Shape Shape => shape;
-
         public Vector3 Center => transform.position;
 
         public Vector3 MinAxes => minAxes;

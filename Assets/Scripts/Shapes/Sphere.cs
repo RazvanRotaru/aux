@@ -1,3 +1,5 @@
+using System;
+
 public class Sphere : Shape
 {
     // Start is called before the first frame update
@@ -6,5 +8,10 @@ public class Sphere : Shape
         base.Reset();
         Type = ShapeType.Sphere;
         RequestMeshData();
+    }
+
+    private void Start()
+    {
+        Reset();
     }
 }

@@ -44,28 +44,27 @@ namespace Collisions.GPU
     struct ShapeInfo
     {
         Vector2Int pointInfo;
-
-        Vector3 center;
+        int isSphere;
         float radius;
 
 
-        public ShapeInfo(Transform t, Vector2Int p, float r)
+        public ShapeInfo(Shape s, Vector2Int p, float r)
         {
             pointInfo = p;
-            center = t.position;
             radius = r;
+            isSphere = s is Sphere ? 1 : 0;
         }
     }
 
     struct TransformMat
     {
         Matrix4x4 R;
-        Matrix4x4 T;
+        Vector3 T;
 
         public TransformMat(Transform t)
         {
             R = Matrix4x4.Rotate(t.rotation);
-            T = Matrix4x4.Translate(t.position);
+            T = t.position;
         }
     }
 
@@ -86,15 +85,14 @@ namespace Collisions.GPU
 
         #endregion
 
-        [SerializeField] private List<Shape> colliders;
+        [SerializeField] private List<SphereCollider> colliders;
 
         [SerializeField] private ComputeShader detectionLogic;
 
-        private Kernel kDetect;
+        private Kernel _kDetect;
 
 
         //DEBUG
-
         [SerializeField] private Vector2[] results;
 
 
@@ -111,23 +109,15 @@ namespace Collisions.GPU
         private void Start()
         {
             detectionLogic = Resources.Load<ComputeShader>("Shaders/CollisionDetection");
-            kDetect = new Kernel(detectionLogic, "CollisionDetection");
+            _kDetect = new Kernel(detectionLogic, "CollisionDetection");
 
-            colliders.AddRange(FindObjectsOfType<Shape>());
+            colliders.AddRange(FindObjectsOfType<SphereCollider>());
 
             results = new Vector2[colliders.Count * colliders.Count];
 
             InitializeBuffers();
 
             detectionLogic.SetInt("objectsNo", colliders.Count);
-            detectionLogic.SetBuffer(kDetect.KernelID, "halfedgeInfo", _halfEdgeInfoBuffer);
-            detectionLogic.SetBuffer(kDetect.KernelID, "faceInfo", _faceInfoBuffer);
-            detectionLogic.SetBuffer(kDetect.KernelID, "halfedges", _halfEdgesBuffer);
-            detectionLogic.SetBuffer(kDetect.KernelID, "faces", _facesBuffer);
-            detectionLogic.SetBuffer(kDetect.KernelID, "shapes", _shapesBuffer);
-            detectionLogic.SetBuffer(kDetect.KernelID, "points", _pointsBuffer);
-            detectionLogic.SetBuffer(kDetect.KernelID, "collisions", _collisionsBuffer);
-            detectionLogic.SetBuffer(kDetect.KernelID, "mat", _mats);
         }
 
         private void OnDisable()
@@ -161,12 +151,7 @@ namespace Collisions.GPU
         {
             UpdateBuffers();
 
-            detectionLogic.SetBuffer(kDetect.KernelID, "halfedges", _halfEdgesBuffer);
-            detectionLogic.SetBuffer(kDetect.KernelID, "faces", _facesBuffer);
-            detectionLogic.SetBuffer(kDetect.KernelID, "shapes", _shapesBuffer);
-
-            detectionLogic.Dispatch(kDetect.KernelID, colliders.Count, colliders.Count, 1);
-
+            detectionLogic.Dispatch(_kDetect.KernelID, colliders.Count, colliders.Count, 1);
 
             _collisionsBuffer.GetData(results);
 
@@ -182,6 +167,10 @@ namespace Collisions.GPU
                     colliders[(int) elm.x].GetComponent<Collider>().Collides(true);
                 }
             }
+            
+            // TODO compute locally contact points
+            
+            // TODO add physics on GPU
         }
 
         private void InitializeBuffers()
@@ -205,27 +194,26 @@ namespace Collisions.GPU
                 sz += 1;
 
                 {
-                    halfEdgesInfo.AddRange(s.HalfEdges.Select(he => new HalfEdgeInfo(he)));
+                    halfEdgesInfo.AddRange(s.Shape.HalfEdges.Select(he => new HalfEdgeInfo(he)));
 
-                    var halfEdges = s.HalfEdges.Count;
+                    var halfEdges = s.Shape.HalfEdges.Count;
                     heOffsets.Add(new Vector2Int(hC, halfEdges));
                     hC += halfEdges;
                 }
 
                 {
-                    facesInfo.AddRange(s.Faces.Select(f => new FaceInfo(f)));
+                    facesInfo.AddRange(s.Shape.Faces.Select(f => new FaceInfo(f)));
 
-                    var faces = s.Faces.Count;
+                    var faces = s.Shape.Faces.Count;
                     faceOffsets.Add(new Vector2Int(fC, faces));
                     fC += faces;
                 }
 
                 {
-                    points.AddRange(s.MeshInfo.vertexPosition);
+                    points.AddRange(s.Shape.MeshInfo.vertexPosition);
 
-                    var pts = s.MeshInfo.vertexPosition.Length;
-                    shapesInfo.Add(new ShapeInfo(s.transform, new Vector2Int(sC, pts),
-                        s.GetComponent<SphereCollider>().Radius));
+                    var pts = s.Shape.MeshInfo.vertexPosition.Length;
+                    shapesInfo.Add(new ShapeInfo(s.Shape, new Vector2Int(sC, pts), s.Radius));
                     sC += pts;
                 }
 
@@ -236,27 +224,35 @@ namespace Collisions.GPU
 
             _pointsBuffer = new ComputeBuffer(points.Count, 12);
             _pointsBuffer.SetData(points);
+            detectionLogic.SetBuffer(_kDetect.KernelID, "points", _pointsBuffer);
 
             _shapesBuffer = new ComputeBuffer(shapesInfo.Count, Marshal.SizeOf(typeof(ShapeInfo)));
             _shapesBuffer.SetData(shapesInfo);
+            detectionLogic.SetBuffer(_kDetect.KernelID, "shapes", _shapesBuffer);
 
             _mats = new ComputeBuffer(transformMats.Count, Marshal.SizeOf(typeof(TransformMat)));
             _mats.SetData(transformMats);
+            detectionLogic.SetBuffer(_kDetect.KernelID, "mat", _mats);
 
             _halfEdgeInfoBuffer = new ComputeBuffer(heOffsets.Count, Marshal.SizeOf(typeof(Vector2Int)));
             _halfEdgeInfoBuffer.SetData(heOffsets);
+            detectionLogic.SetBuffer(_kDetect.KernelID, "halfedgeInfo", _halfEdgeInfoBuffer);
 
             _faceInfoBuffer = new ComputeBuffer(faceOffsets.Count, Marshal.SizeOf(typeof(Vector2Int)));
             _faceInfoBuffer.SetData(faceOffsets);
+            detectionLogic.SetBuffer(_kDetect.KernelID, "faceInfo", _faceInfoBuffer);
 
             _halfEdgesBuffer = new ComputeBuffer(halfEdgesInfo.Count, Marshal.SizeOf(typeof(HalfEdgeInfo)));
             _halfEdgesBuffer.SetData(halfEdgesInfo);
+            detectionLogic.SetBuffer(_kDetect.KernelID, "halfedges", _halfEdgesBuffer);
 
             _facesBuffer = new ComputeBuffer(facesInfo.Count, Marshal.SizeOf(typeof(FaceInfo)));
             _facesBuffer.SetData(facesInfo);
+            detectionLogic.SetBuffer(_kDetect.KernelID, "faces", _facesBuffer);
 
             _collisionsBuffer = new ComputeBuffer(sz * sz, Marshal.SizeOf(typeof(Vector2)));
             _collisionsBuffer.SetData(new List<Vector2>(sz * sz));
+            detectionLogic.SetBuffer(_kDetect.KernelID, "collisions", _collisionsBuffer);
         }
 
         private void UpdateBuffers()
@@ -269,14 +265,21 @@ namespace Collisions.GPU
 
             foreach (var s in colliders)
             {
-                halfEdgesInfo.AddRange(s.HalfEdges.Select(he => new HalfEdgeInfo(he)));
-                facesInfo.AddRange(s.Faces.Select(f => new FaceInfo(f)));
+                halfEdgesInfo.AddRange(s.Shape.HalfEdges.Select(he => new HalfEdgeInfo(he)));
+                facesInfo.AddRange(s.Shape.Faces.Select(f => new FaceInfo(f)));
                 transformMats.Add(new TransformMat(s.transform));
             }
 
-            _facesBuffer.SetData(facesInfo);
             _halfEdgesBuffer.SetData(halfEdgesInfo);
+            detectionLogic.SetBuffer(_kDetect.KernelID, "halfedges", _halfEdgesBuffer);
+
+            _facesBuffer.SetData(facesInfo);
+            detectionLogic.SetBuffer(_kDetect.KernelID, "faces", _facesBuffer);
+
             _mats.SetData(transformMats);
+            detectionLogic.SetBuffer(_kDetect.KernelID, "mat", _mats);
+            
+            // TODO reset _collisionsBuffer each frame
         }
     }
 }

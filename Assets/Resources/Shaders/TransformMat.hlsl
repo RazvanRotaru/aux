@@ -4,7 +4,7 @@
 struct TransformMat
 {
     float4x4 R;
-    float4x4 T;
+    float3 T;
 };
 
 #endif
