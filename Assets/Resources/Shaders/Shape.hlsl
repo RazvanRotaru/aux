@@ -4,8 +4,9 @@
 struct Shape
 {
     uint2 pointInfo;
-    float4x4 R;
-    float4x4 T;
+
+    float3 center;
+    float radius;
 };
 
 #endif

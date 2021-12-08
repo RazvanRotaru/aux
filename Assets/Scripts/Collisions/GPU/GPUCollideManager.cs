@@ -44,12 +44,26 @@ namespace Collisions.GPU
     struct ShapeInfo
     {
         Vector2Int pointInfo;
+
+        Vector3 center;
+        float radius;
+
+
+        public ShapeInfo(Transform t, Vector2Int p, float r)
+        {
+            pointInfo = p;
+            center = t.position;
+            radius = r;
+        }
+    }
+
+    struct TransformMat
+    {
         Matrix4x4 R;
         Matrix4x4 T;
 
-        public ShapeInfo(Transform t, Vector2Int p)
+        public TransformMat(Transform t)
         {
-            pointInfo = p;
             R = Matrix4x4.Rotate(t.rotation);
             T = Matrix4x4.Translate(t.position);
         }
@@ -68,6 +82,7 @@ namespace Collisions.GPU
         private ComputeBuffer _halfEdgeInfoBuffer;
         private ComputeBuffer _faceInfoBuffer;
         private ComputeBuffer _collisionsBuffer;
+        private ComputeBuffer _mats;
 
         #endregion
 
@@ -98,8 +113,7 @@ namespace Collisions.GPU
             detectionLogic = Resources.Load<ComputeShader>("Shaders/CollisionDetection");
             kDetect = new Kernel(detectionLogic, "CollisionDetection");
 
-            var polygonColliders = FindObjectsOfType<Cube>();
-            colliders.AddRange(polygonColliders);
+            colliders.AddRange(FindObjectsOfType<Shape>());
 
             results = new Vector2[colliders.Count * colliders.Count];
 
@@ -113,6 +127,7 @@ namespace Collisions.GPU
             detectionLogic.SetBuffer(kDetect.KernelID, "shapes", _shapesBuffer);
             detectionLogic.SetBuffer(kDetect.KernelID, "points", _pointsBuffer);
             detectionLogic.SetBuffer(kDetect.KernelID, "collisions", _collisionsBuffer);
+            detectionLogic.SetBuffer(kDetect.KernelID, "mat", _mats);
         }
 
         private void OnDisable()
@@ -171,12 +186,13 @@ namespace Collisions.GPU
 
         private void InitializeBuffers()
         {
-            List<Vector3> points = new List<Vector3>();
-            List<ShapeInfo> shapesInfo = new List<ShapeInfo>();
-            List<Vector2Int> heOffsets = new List<Vector2Int>();
-            List<Vector2Int> faceOffsets = new List<Vector2Int>();
-            List<HalfEdgeInfo> halfEdgesInfo = new List<HalfEdgeInfo>();
-            List<FaceInfo> facesInfo = new List<FaceInfo>();
+            var points = new List<Vector3>();
+            var shapesInfo = new List<ShapeInfo>();
+            var heOffsets = new List<Vector2Int>();
+            var faceOffsets = new List<Vector2Int>();
+            var halfEdgesInfo = new List<HalfEdgeInfo>();
+            var facesInfo = new List<FaceInfo>();
+            var transformMats = new List<TransformMat>();
 
             var hC = 0;
             var fC = 0;
@@ -208,8 +224,13 @@ namespace Collisions.GPU
                     points.AddRange(s.MeshInfo.vertexPosition);
 
                     var pts = s.MeshInfo.vertexPosition.Length;
-                    shapesInfo.Add(new ShapeInfo(s.transform, new Vector2Int(sC, pts)));
+                    shapesInfo.Add(new ShapeInfo(s.transform, new Vector2Int(sC, pts),
+                        s.GetComponent<SphereCollider>().Radius));
                     sC += pts;
+                }
+
+                {
+                    transformMats.Add(new TransformMat(s.transform));
                 }
             }
 
@@ -218,6 +239,9 @@ namespace Collisions.GPU
 
             _shapesBuffer = new ComputeBuffer(shapesInfo.Count, Marshal.SizeOf(typeof(ShapeInfo)));
             _shapesBuffer.SetData(shapesInfo);
+
+            _mats = new ComputeBuffer(transformMats.Count, Marshal.SizeOf(typeof(TransformMat)));
+            _mats.SetData(transformMats);
 
             _halfEdgeInfoBuffer = new ComputeBuffer(heOffsets.Count, Marshal.SizeOf(typeof(Vector2Int)));
             _halfEdgeInfoBuffer.SetData(heOffsets);
@@ -237,10 +261,9 @@ namespace Collisions.GPU
 
         private void UpdateBuffers()
         {
-            List<HalfEdgeInfo> halfEdgesInfo = new List<HalfEdgeInfo>();
-            List<FaceInfo> facesInfo = new List<FaceInfo>();
-            List<ShapeInfo> shapesInfo = new List<ShapeInfo>();
-
+            var halfEdgesInfo = new List<HalfEdgeInfo>();
+            var facesInfo = new List<FaceInfo>();
+            var transformMats = new List<TransformMat>();
 
             var sC = 0;
 
@@ -248,16 +271,12 @@ namespace Collisions.GPU
             {
                 halfEdgesInfo.AddRange(s.HalfEdges.Select(he => new HalfEdgeInfo(he)));
                 facesInfo.AddRange(s.Faces.Select(f => new FaceInfo(f)));
-                {
-                    var pts = s.MeshInfo.vertexPosition.Length;
-                    shapesInfo.Add(new ShapeInfo(s.transform, new Vector2Int(sC, pts)));
-                    sC += pts;
-                }
+                transformMats.Add(new TransformMat(s.transform));
             }
 
             _facesBuffer.SetData(facesInfo);
             _halfEdgesBuffer.SetData(halfEdgesInfo);
-            _shapesBuffer.SetData(shapesInfo);
+            _mats.SetData(transformMats);
         }
     }
 }

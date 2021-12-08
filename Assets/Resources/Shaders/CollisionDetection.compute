@@ -4,6 +4,7 @@
 #include "HalfEdge.hlsl"
 #include "Face.hlsl"
 #include "Shape.hlsl"
+#include "TransformMat.hlsl"
 
 #define OFFSET 0
 #define NUM 1
@@ -20,10 +21,11 @@ RWStructuredBuffer<HalfEdge> halfedges;
 RWStructuredBuffer<Face> faces;
 RWStructuredBuffer<Shape> shapes;
 RWStructuredBuffer<float3> points;
+RWStructuredBuffer<TransformMat> mat;
 
 RWStructuredBuffer<float2> collisions;
 
-float3 SupportPoint(const Shape shape, const float3 dir)
+float3 SupportPoint(const Shape shape, const float3 dir, const float4x4 r, const float4x4 t)
 {
     const uint points_offset = shape.pointInfo[OFFSET];
     const uint points_num = shape.pointInfo[NUM];
@@ -33,7 +35,7 @@ float3 SupportPoint(const Shape shape, const float3 dir)
 
     for (uint i = points_offset; i < points_offset + points_num; i++)
     {
-        const float3 vert = mul(shape.R, float4(points[i], 1)).xyz;
+        const float3 vert = mul(r, float4(points[i], 1)).xyz;
         const float projection = dot(vert, dir);
 
         if (projection > best_projection)
@@ -43,7 +45,7 @@ float3 SupportPoint(const Shape shape, const float3 dir)
         }
     }
 
-    return mul(shape.T, float4(best_vert, 1)).xyz;
+    return mul(t, float4(best_vert, 1)).xyz;
 }
 
 float QueryFace(const uint a_id, const uint b_id, out int face_id)
@@ -52,14 +54,17 @@ float QueryFace(const uint a_id, const uint b_id, out int face_id)
     const uint faces_num = faceInfo[a_id][NUM];
 
     const Shape shape = shapes[b_id];
+    const float4x4 R = mat[b_id].R;
+    const float4x4 T = mat[b_id].T;
+
     float best_distance = -NA;
 
     for (uint i = faces_off; i < faces_off + faces_num; i++)
     {
         const Face curr_face = faces[i];
-        const float3 supportPoint = SupportPoint(shape, -curr_face.normal);
+        const float3 support_point = SupportPoint(shape, -curr_face.normal, R, T);
 
-        const float distance = dot(curr_face.normal, supportPoint - curr_face.center);
+        const float distance = dot(curr_face.normal, support_point - curr_face.center);
 
         if (distance > best_distance)
         {
