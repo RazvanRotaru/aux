@@ -11,7 +11,7 @@
 #define EPS 1e-5
 
 
-uint objectsNo;
+int objectsNo;
 
 RWStructuredBuffer<uint2> halfedgeInfo;
 RWStructuredBuffer<uint2> faceInfo;
@@ -132,49 +132,46 @@ float QueryEdge(uint a_id, uint b_id, out uint edgeA, out uint edgeB)
 }
 
 
-[numthreads(1024, 1, 1)]
+[numthreads(32, 32, 1)]
 void PolygonVsPolygon(uint3 gid: SV_DispatchThreadID)
 {
-    if (gid.x >= objectsNo)
+    if (gid.x >= objectsNo || gid.y >= objectsNo)
     {
-        collisions[gid.x] = float2(-99, -99);
         return;
     }
     const int id = gid.x;
+    const int other_id = gid.y;
 
-    for (int other_id = 0; other_id < objectsNo; other_id++)
+    int index = id * objectsNo + other_id;
+
+    collisions[index] = float2(-100 - id, -100 - other_id);
+    if (other_id == id || length(collisions[index]) <= 0) return;
+    collisions[index] = float2(-500 - id, -500 - other_id);
+
+    uint faceA = 0;
+    float distAB = QueryFace(id, other_id, faceA);
+    if (distAB > 0.0f)
     {
-        int index = id * objectsNo + other_id;
-        
-        collisions[index] = float2(-100 - id, -100 - other_id);
-        if (other_id == id) continue;
-        collisions[index] = float2(-500 - id, -500 - other_id);
-
-        uint faceA = 0;
-        float distAB = QueryFace(id, other_id, faceA);
-        if (distAB > 0.0f)
-        {
-            collisions[index] = float2(-1, distAB);
-            continue;
-        }
-
-        uint faceB = 0;
-        float distBA = QueryFace(other_id, id, faceB);
-        if (distBA > 0.0f)
-        {
-            collisions[index] = float2(-2, distBA);
-            continue;
-        }
-
-
-        uint edgeA = 0, edgeB = 0;
-        float distEdge = QueryEdge(id, other_id, edgeA, edgeB);
-        if (distEdge > 0.0f)
-        {
-            collisions[index] = float2(-3, distEdge);
-            continue;
-        }
-
-        collisions[index] = float2(id, other_id);
+        collisions[index] = float2(-1, distAB);
+        return;
     }
+
+    uint faceB = 0;
+    float distBA = QueryFace(other_id, id, faceB);
+    if (distBA > 0.0f)
+    {
+        collisions[index] = float2(-2, distBA);
+        return;
+    }
+
+
+    uint edgeA = 0, edgeB = 0;
+    float distEdge = QueryEdge(id, other_id, edgeA, edgeB);
+    if (distEdge > 0.0f)
+    {
+        collisions[index] = float2(-3, distEdge);
+        return;
+    }
+
+    collisions[index] = float2(id, other_id);
 }

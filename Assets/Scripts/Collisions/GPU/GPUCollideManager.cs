@@ -22,7 +22,7 @@ namespace Collisions.GPU
         public HalfEdgeInfo(HalfEdge halfEdge)
         {
             vertex = halfEdge.Vertex;
-            local_vertex = halfEdge.VertexLocal;
+            local_vertex = halfEdge.Vertex - halfEdge.Transform.position;
             edge = halfEdge.Edge;
             n1 = halfEdge.Face.Normal;
             n2 = halfEdge.Twin.Face.Normal;
@@ -150,7 +150,7 @@ namespace Collisions.GPU
             detectionLogic.SetBuffer(kDetect.KernelID, "faces", _facesBuffer);
             detectionLogic.SetBuffer(kDetect.KernelID, "shapes", _shapesBuffer);
 
-            detectionLogic.Dispatch(kDetect.KernelID, colliders.Count, 1, 1);
+            detectionLogic.Dispatch(kDetect.KernelID, colliders.Count, colliders.Count, 1);
 
 
             _collisionsBuffer.GetData(results);
