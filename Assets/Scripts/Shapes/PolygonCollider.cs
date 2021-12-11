@@ -79,16 +79,6 @@ namespace Shapes
             if (drawCollider)
             {
                 Gizmos.color = Color.green;
-                //Gizmos.DrawWireCube(transform.position, halfSizes * 2);
-
-                //Vector3 localForward = transform.InverseTransformDirection(transform.forward);
-                //Vector3 localRight = transform.InverseTransformDirection(transform.right);
-                //Vector3 localUp = transform.InverseTransformDirection(transform.up);
-
-                //Gizmos.DrawLine(transform.position, transform.position + transform.forward * 10);
-                //Gizmos.DrawLine(transform.position, transform.position + transform.up * 10);
-                //Gizmos.DrawLine(transform.position, transform.position + transform.right * 10);
-
 
                 Gizmos.color = Color.black;
                 Vector3 minCorner = transform.position - transform.right * halfSizes.x;

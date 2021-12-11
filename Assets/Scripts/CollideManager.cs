@@ -13,6 +13,8 @@ public class CollideManager : MonoBehaviour
     public const float Eps = 1e-3f;
     [SerializeField] private GameObject debugPoint;
     [SerializeField] private bool debugContactPoints;
+    private Dictionary<(Collider, Collider), bool> collidingObjects = new Dictionary<(Collider, Collider), bool>();
+
 
     public static CollideManager Instance { get; private set; }
     public GameObject DebugPoint => debugPoint;
@@ -621,11 +623,15 @@ public class CollideManager : MonoBehaviour
 
         var halfPlanes = FindObjectsOfType<HalfPlaneCollider>();
         colliders.AddRange(halfPlanes);
+
+        CollisionResolution.Instance.SetColliders(colliders);
     }
 
     private void Update()
     {
         var others = new List<PolygonCollider>();
+        CollisionResolution.Instance.UpdateFrameDrag();
+
 
         foreach (var a in colliders)
         {
@@ -633,13 +639,16 @@ public class CollideManager : MonoBehaviour
             others.Clear();
             foreach (var b in colliders.Where(b => a.GetInstanceID() != b.GetInstanceID()))
             {
-                // TODO store (a, b) in a pair list as their collision has been computed 
-                // if (Dictionary.Contains(ab) || Dictionary.Contacins(ba)) continue;
-
+                if (collidingObjects.ContainsKey((a, b)) || collidingObjects.ContainsKey((b, a))) continue;
                 if (!a.IsColliding(b, out var contactPoints)) continue;
 
-                isColliding = true;
                 if (debugContactPoints && contactPoints != null)
+                isColliding = true;
+ 
+                collidingObjects.Add((a, b), true);
+                CollisionResolution.Instance.ResolveCollision(a, b, contactPoints);
+
+                if (debugContactPoints)
                 {
                     foreach (var cp in contactPoints)
                     {
@@ -655,6 +664,7 @@ public class CollideManager : MonoBehaviour
             a.Collides(isColliding);
         }
 
-        _aux = false;
+        collidingObjects.Clear();
+        aux = false;
     }
 }
