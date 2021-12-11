@@ -665,6 +665,6 @@ public class CollideManager : MonoBehaviour
         }
 
         collidingObjects.Clear();
-        aux = false;
+        _aux = false;
     }
 }
