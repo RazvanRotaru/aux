@@ -7,6 +7,7 @@ public class CollisionResolution : MonoBehaviour
     [SerializeField] private Vector3 gravity = new Vector3(0.0f, -10.0f, 0.0f);
     [SerializeField] private float drag = 0.995f;
     [SerializeField] private float resitution = 0.95f;
+    private int numberOfIterations;
     private List<Collider> allColliders;
     private float frameDrag;
     public const float infiniteMassLimit = 0.0001f;
@@ -55,23 +56,16 @@ public class CollisionResolution : MonoBehaviour
         Vector3 velocity = new Vector3(0, 0, 0);
         if (a.InverseMass > infiniteMassLimit) velocity += a.Velocity;
         if (b.InverseMass > infiniteMassLimit) velocity -= b.Velocity;
-        Debug.Log($"Velocity <color=yellow>{velocity}</color>");
+        //Debug.Log($"Velocity <color=yellow>{velocity}</color>");
         return Vector3.Dot(velocity, normal);
     }
 
-    public void ResolveCollision(Collider a, Collider b, List<Shapes.ContactPoint> points)
+    void ResolveVelocity(Collider a, Collider b, Shapes.ContactPoint point)
     {
-        Debug.Log("RESOLVING COLLISION!");
+        Vector3 contactNormal = point.Normal;
 
-        if (points.Count <= 0)
-        {
-            return;
-        }
-
-        Vector3 contactNormal = points[0].Normal; // For testing
-
-        Debug.Log($"Contact normal <color=yellow>{contactNormal}</color>");
-        Debug.Log($"Object {a} Velocity <color=yellow>{a.Velocity}</color>");
+        //Debug.Log($"Contact normal <color=yellow>{contactNormal}</color>");
+        //Debug.Log($"Object {a} Velocity <color=yellow>{a.Velocity}</color>");
 
         float separatingVelocity = ComputeSeparatingVelocity(a, b, contactNormal);
 
@@ -80,9 +74,7 @@ public class CollisionResolution : MonoBehaviour
             return;
         }
 
-      
-        Debug.Log($"Separating velocity <color=yellow>{separatingVelocity}</color>");
-
+        //Debug.Log($"Separating velocity <color=yellow>{separatingVelocity}</color>");
 
         float newSeparatingVelocity = -separatingVelocity * resitution; // This is the restitution
 
@@ -96,12 +88,11 @@ public class CollisionResolution : MonoBehaviour
         if (velocityCausedByGravity < 0)
         {
 
-            newSeparatingVelocity += resitution * velocityCausedByGravity * 2;
-            //a.SetVelocity(new Vector3(a.Velocity.x, 0, a.Velocity.z));
+            newSeparatingVelocity += resitution * velocityCausedByGravity * 2; // The *2 is an error rate; Probably make it a variable with range [1, 2]
 
             if (newSeparatingVelocity < 0)
             {
-                Debug.Log($"New separating velocity set to 0");
+                //Debug.Log($"New separating velocity set to 0");
                 newSeparatingVelocity = 0;
             }
         }
@@ -110,7 +101,7 @@ public class CollisionResolution : MonoBehaviour
 
 
         Debug.Log($"Separating velocity <color=orange>{separatingVelocity}</color>");
-        Debug.Log($"Velocity on normal <color=yellor>{Vector3.Dot(a.Velocity, contactNormal)}</color>");
+        //Debug.Log($"Velocity on normal <color=yellor>{Vector3.Dot(a.Velocity, contactNormal)}</color>");
 
 
         float totalInverseMass = 0.0f;
@@ -127,19 +118,17 @@ public class CollisionResolution : MonoBehaviour
 
         if (a.InverseMass > infiniteMassLimit) a.SetVelocity(a.Velocity + impulsePerMass * a.InverseMass);
         if (b.InverseMass > infiniteMassLimit) b.SetVelocity(b.Velocity - impulsePerMass * b.InverseMass);
-
-        ResolveInterpenetration(a, b, points);
     }
 
-    void ResolveInterpenetration(Collider a, Collider b, List<Shapes.ContactPoint> points)
+    (Vector3 deltaA, Vector3 deltaB) ResolveInterpenetration(Collider a, Collider b, Shapes.ContactPoint point, float _penetration)
     {
-        float penetration = 0;
-        Vector3 contactNormal = points[0].Normal;
-        penetration = points[0].Penetration;
+        //float penetration = point.Penetration;
+        float penetration = _penetration;
+        Vector3 contactNormal = point.Normal;
 
         if (penetration <= 0)
         {
-            return;
+            return (new Vector3(0,0,0), new Vector3(0, 0, 0));
         }
 
         // Movement is based on the total inverse mass
@@ -149,7 +138,7 @@ public class CollisionResolution : MonoBehaviour
 
         if (totalInverseMass == 0.0f)
         {
-            return;
+            return (new Vector3(0, 0, 0), new Vector3(0, 0, 0));
         }
 
         Vector3 movementPerMass = contactNormal * (penetration / totalInverseMass);
@@ -161,7 +150,88 @@ public class CollisionResolution : MonoBehaviour
 
         a.transform.position += deltaA;
         b.transform.position += deltaB;
+
+        return (deltaA, deltaB);
     }
+
+    public void ResolveCollision(Collider a, Collider b, List<Shapes.ContactPoint> points)
+    {
+        Debug.Assert(points != null && points.Count > 0, "Can't resolve collision without contact points!");
+        Debug.Log($"<color=red>I'm calling this! {points.Count} collisions!</color>");
+
+        if (points.Count >= 1)
+        {
+            Debug.Log($"{a} has <color=blue>one collision</color> point!");
+            ResolveVelocity(a, b, points[0]);
+            ResolveInterpenetration(a, b, points[0], points[0].Penetration);
+
+        } else if (points.Count > 1)
+        {
+            int debugIteration = 0;
+            Debug.Log($"{a} has <color=cyan>{points.Count} collision</color> point!");
+            numberOfIterations = points.Count * 2;
+
+            List<float> penetrations = new List<float>();
+            
+            for (int j = 0; j < points.Count; j++)
+            {
+                penetrations.Add(points[j].Penetration);
+                Debug.Log($"Penetration: {points[j].Penetration}");
+            }
+
+            // We first do the resolution for the velocity
+            for (int i = 0; i < numberOfIterations; i++)
+            {
+                float maxVel = Mathf.Infinity;
+                int pointIndex = points.Count;
+
+                for (int j = 0; j < points.Count; j++)
+                {
+                    float sepVel = ComputeSeparatingVelocity(a, b, points[j].Normal);
+                    if (sepVel < maxVel && (sepVel < 0 || penetrations[j] > 0))
+                    {
+                        maxVel = sepVel;
+                        pointIndex = j;
+                    }
+                }
+
+                Debug.Log($"Max velocity {maxVel}");
+                Debug.Log($"{pointIndex}");
+                if (pointIndex == points.Count)
+                {
+                    break;
+                }
+                Debug.Log($"My penetration {penetrations[pointIndex]}");
+
+                ResolveVelocity(a, b, points[pointIndex]);
+
+                Vector3 deltaA;
+                Vector3 deltaB;
+                (deltaA, deltaB) = ResolveInterpenetration(a, b, points[pointIndex], penetrations[pointIndex]);
+
+                Vector3 resultDelta = deltaA - deltaB;
+
+                //Debug.Log($"DeltaA {deltaA.x} {deltaA.y} {deltaA.z}");
+                //Debug.Log($"DeltaB {deltaB.x} {deltaB.y} {deltaB.z}");
+                //Debug.Log($"Vector result {resultDelta}");
+                //Debug.Log($"Value on collision normal: {Vector3.Dot(resultDelta, points[pointIndex].Normal)}");
+
+                //float displacement = Vector3.Dot(resultDelta, points[pointIndex].Normal);
+
+                //// To not recompute the collision, offset the other penetrations
+
+                for (int j = 0; j < points.Count; j++)
+                {
+                    penetrations[j] -= (Vector3.Dot(resultDelta, points[pointIndex].Normal));
+                }
+
+                debugIteration++;
+            }
+
+            Debug.Log($"Broke out after {debugIteration} iteration!");
+        }
+    }
+    
 
     private void Awake()
     {

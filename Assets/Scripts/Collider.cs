@@ -23,6 +23,7 @@ public abstract class Collider : MonoBehaviour, ICollidable
     [SerializeField]protected float mass = 1.0f;
     protected float inverseMass; // It is preferred this way to avoid division by 0; Since we can represent infinity it will always crash at 0 since 1/0 -> infinity
     protected Vector3 forceAccumulation = new Vector3(0.0f, 0.0f, 0.0f);
+    protected Vector3 rotation; // Used for angular velocity
 
     public Vector3 Velocity => velocity;
     public Vector3 Acceleration => acceleration;
@@ -31,6 +32,8 @@ public abstract class Collider : MonoBehaviour, ICollidable
     public float Mass => mass;
 
     public Vector3 ForceAccumulation => forceAccumulation;
+
+    public Vector3 AngularVelocity => rotation;
 
 
     public void SetVelocity(Vector3 _velocity)
@@ -41,6 +44,11 @@ public abstract class Collider : MonoBehaviour, ICollidable
     public void SetAcceleration(Vector3 _acceleration)
     {
         acceleration = _acceleration;
+    }
+
+    public void SetAngularVelocity(Vector3 _rotation)
+    {
+        rotation = _rotation;
     }
 
     private void ComputeInverseMass()
@@ -75,7 +83,7 @@ public abstract class Collider : MonoBehaviour, ICollidable
 
     private void Update()
     {
-        Debug.Log($"Acceleration of {this}: {acceleration}!");
+        //Debug.Log($"Acceleration of {this}: {acceleration}!");
     }
 
     public virtual void Collides(bool value)
