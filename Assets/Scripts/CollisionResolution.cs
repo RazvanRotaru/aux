@@ -135,7 +135,7 @@ public class CollisionResolution : MonoBehaviour
     {
         float penetration = 0;
         Vector3 contactNormal = points[0].Normal;
-        //penetration = points[0].Penetration;
+        penetration = points[0].Penetration;
 
         if (penetration <= 0)
         {
