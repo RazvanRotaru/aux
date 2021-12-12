@@ -16,11 +16,27 @@ public class SphereCollider : Collider
     protected override void Awake()
     {
         base.Awake();
-        Debug.Assert(meshFilter.mesh.vertices.Length > 0, "Cannot generate collider from empty mesh!");
 
-        Shape.HalfEdges.ForEach(he => Debug.Assert(he.Transform != null, "A halfedges transform reference is null"));
+        if (meshFilter.mesh.vertices.Length > 0)
+        {
+            ComputeRadiusFromMesh(meshFilter.mesh.vertices);
+            isGenerated = true;
+        }
+        else
+        {
+            Debug.LogWarning($"{this} cannot generate sphere collider from empty mesh");
+        }
+        //Shape.HalfEdges.ForEach(he => Debug.Assert(he.Transform != null, "A halfedges transform reference is null"));
+    }
 
-        ComputeRadiusFromMesh(meshFilter.mesh.vertices);
+    public override void GenerateCollider()
+    {
+        base.GenerateCollider();
+        if (!isGenerated)
+        {
+            ComputeRadiusFromMesh(meshFilter.mesh.vertices);
+            isGenerated = true;
+        }
     }
 
     private void ComputeRadiusFromMesh(Vector3[] vertices)

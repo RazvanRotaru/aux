@@ -624,6 +624,8 @@ public class CollideManager : MonoBehaviour
         var halfPlanes = FindObjectsOfType<HalfPlaneCollider>();
         colliders.AddRange(halfPlanes);
 
+        Debug.Log($"Added {colliders.Count} colliders!");
+
         CollisionResolution.Instance.SetColliders(colliders);
     }
 
@@ -631,7 +633,6 @@ public class CollideManager : MonoBehaviour
     {
         var others = new List<PolygonCollider>();
         CollisionResolution.Instance.UpdateFrameDrag();
-
 
         foreach (var a in colliders)
         {
@@ -666,5 +667,19 @@ public class CollideManager : MonoBehaviour
 
         collidingObjects.Clear();
         _aux = false;
+    }
+
+    public void AddCollider(Shape shape)
+    {
+        PolygonCollider p = shape.GetComponent<PolygonCollider>();
+        SphereCollider s = shape.GetComponent<SphereCollider>();
+
+        if (p != null)
+        {
+            colliders.Insert(0, p);
+        } else if (s != null)
+        {
+            colliders.Insert(0, s);
+        }
     }
 }

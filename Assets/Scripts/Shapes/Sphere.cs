@@ -1,4 +1,5 @@
 using System;
+using UnityEngine;
 
 public class Sphere : Shape
 {
@@ -13,5 +14,14 @@ public class Sphere : Shape
     private void Start()
     {
         Reset();
+        SphereCollider collider = GetComponent<SphereCollider>();
+
+        if (collider != null)
+        {
+            collider.GenerateCollider();
+        } else
+        {
+            Debug.LogWarning("No Sphere collider attached to sphere object");
+        }
     }
 }

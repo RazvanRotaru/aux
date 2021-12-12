@@ -97,6 +97,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   red: {fileID: 2100000, guid: bda8e881faa9ce0468afbea021f21dac, type: 2}
   blue: {fileID: 2100000, guid: a20ebe7f9ff9ed84fac85b6196c33ab2, type: 2}
+  yellow: {fileID: 2100000, guid: 96d37a171bf711b4fbed44744e97d40a, type: 2}
   MeshInfo:
     vertexPosition: []
     vertexColors: []
@@ -105,6 +106,7 @@ MonoBehaviour:
     indices: 
   spawnPoint: {x: 0, y: 0, z: 0}
   details: 0
+  debugEdges: 0
 --- !u!114 &1149861304526078464
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -123,3 +125,5 @@ MonoBehaviour:
   shape: {fileID: 0}
   red: {fileID: 0}
   blue: {fileID: 0}
+  yellow: {fileID: 0}
+  mass: 1

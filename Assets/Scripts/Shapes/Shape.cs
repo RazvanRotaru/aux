@@ -84,7 +84,7 @@ public class Shape : MonoBehaviour
 
         var s = new StringBuilder();
         halfEdges.ForEach(x => s.Append($"{x}\n"));
-        Debug.Log(s);
+        //Debug.Log(s);
 
         UpdateMesh();
     }

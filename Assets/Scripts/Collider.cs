@@ -24,6 +24,7 @@ public abstract class Collider : MonoBehaviour, ICollidable
     protected float inverseMass; // It is preferred this way to avoid division by 0; Since we can represent infinity it will always crash at 0 since 1/0 -> infinity
     protected Vector3 forceAccumulation = new Vector3(0.0f, 0.0f, 0.0f);
     protected Vector3 rotation; // Used for angular velocity
+    protected bool isGenerated = false;
 
     public Vector3 Velocity => velocity;
     public Vector3 Acceleration => acceleration;
@@ -81,9 +82,14 @@ public abstract class Collider : MonoBehaviour, ICollidable
         ComputeInverseMass();
     }
 
+    public virtual void GenerateCollider()
+    {
+        return;
+    }
+
     private void Update()
     {
-        //Debug.Log($"Acceleration of {this}: {acceleration}!");
+        //Debug.Log($"Velocity of {this}: {velocity}!");
     }
 
     public virtual void Collides(bool value)

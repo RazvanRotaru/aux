@@ -47,10 +47,10 @@ public class ShapeSpawner : MonoBehaviour
         _nextSpawn = Time.time + objectSpawnCooldown;
 
         // Generate random position
-        Vector3 spawnPosition = new Vector3(Random.Range(-3.0f, 3.0f), Random.Range(-3.0f, 3.0f), Random.Range(-3.0f, 3.0f));
+        Vector3 spawnPosition = new Vector3(Random.Range(.0f, 3.0f), Random.Range(.0f, 3.0f), Random.Range(.0f, 3.0f));
 
-        Shape newShape = Instantiate(shapes[index], spawnPosition, Quaternion.identity);
-        newShape.transform.parent = shapeHolder.transform;
-        newShape.SetInfo(details, spawnPosition);
+        Shape newShape = Instantiate(shapes[index], spawnPosition, Quaternion.Euler(Random.RandomRange(0, 360), Random.RandomRange(0, 360), Random.RandomRange(0, 360)));
+        //newShape.transform.parent = shapeHolder.transform;
+        //newShape.SetInfo(details, spawnPosition);
     }
 }

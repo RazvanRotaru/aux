@@ -25,10 +25,30 @@ namespace Shapes
         protected override void Awake()
         {
             base.Awake();
-            Debug.Assert(meshFilter.mesh.vertices.Length > 0, "Cannot create cube collider from 0 vertices!");
 
-            SphereCollider = GetComponent<SphereCollider>();
-            ComputeProperties(meshFilter.mesh.vertices);
+            if (meshFilter.mesh.vertices.Length > 0)
+            {
+                SphereCollider = GetComponent<SphereCollider>();
+                ComputeProperties(meshFilter.mesh.vertices);
+                isGenerated = true;
+            } else
+            {
+                Debug.LogWarning($"{this} can't generate cube collider from empty mesh!");
+            }
+        }
+
+        public override void GenerateCollider()
+        {
+            base.GenerateCollider();
+            if (!isGenerated)
+            {
+                Debug.Log($"GENERATING CUBE COLLIDER FROM <color=gray> {meshFilter.mesh.vertices.Length} </color> vertices!");
+                SphereCollider = GetComponent<SphereCollider>();
+                SphereCollider.GenerateCollider();
+                ComputeProperties(meshFilter.mesh.vertices);
+                isGenerated = true;
+                CollideManager.Instance.AddCollider(gameObject.GetComponent<Shape>());
+            }
         }
 
         public override bool IsColliding(Collider other, out List<ContactPoint> contactPoints)

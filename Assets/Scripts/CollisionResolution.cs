@@ -100,7 +100,7 @@ public class CollisionResolution : MonoBehaviour
         float deltaVelocity = newSeparatingVelocity - separatingVelocity;
 
 
-        Debug.Log($"Separating velocity <color=orange>{separatingVelocity}</color>");
+        //Debug.Log($"Separating velocity <color=orange>{separatingVelocity}</color>");
         //Debug.Log($"Velocity on normal <color=yellor>{Vector3.Dot(a.Velocity, contactNormal)}</color>");
 
 
@@ -164,9 +164,7 @@ public class CollisionResolution : MonoBehaviour
             Debug.Log($"{a} has <color=blue>one collision</color> point!");
             ResolveVelocity(a, b, points[0]);
             ResolveInterpenetration(a, b, points[0], points[0].Penetration);
-
-        } else if (points.Count > 1)
-        {
+        } else if (points.Count > 1) {
             int debugIteration = 0;
             Debug.Log($"{a} has <color=cyan>{points.Count} collision</color> point!");
             numberOfIterations = points.Count * 2;

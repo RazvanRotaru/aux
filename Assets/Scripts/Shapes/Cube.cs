@@ -1,3 +1,6 @@
+using Shapes;
+using UnityEngine;
+
 public class Cube : Shape
 {
     // Start is called before the first frame update
@@ -12,5 +15,15 @@ public class Cube : Shape
     {
         // RequestMeshData();
         Reset();
+
+        PolygonCollider collider = GetComponent<PolygonCollider>();
+
+        if (collider != null)
+        {
+            collider.GenerateCollider();
+        } else
+        {
+            Debug.LogWarning("Could not get polygon collider in Cube!");
+        }
     }
 }
