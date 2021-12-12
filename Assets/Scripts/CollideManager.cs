@@ -669,6 +669,8 @@ public class CollideManager : MonoBehaviour
         _aux = false;
     }
 
+    // TODO: There is something wrong with the contact points when the
+    // TODO: first collider is a wall; workaround: add everything before the walls
     public void AddCollider(Shape shape)
     {
         PolygonCollider p = shape.GetComponent<PolygonCollider>();
