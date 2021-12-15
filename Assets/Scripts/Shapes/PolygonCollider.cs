@@ -1,5 +1,7 @@
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using Collisions.GPU;
 using UnityEngine;
 using Debug = UnityEngine.Debug;
 
@@ -28,32 +30,26 @@ namespace Shapes
 
             if (meshFilter.mesh.vertices.Length > 0)
             {
-                SphereCollider = GetComponent<SphereCollider>();
-                ComputeProperties(meshFilter.mesh.vertices);
-                isGenerated = true;
+                // SphereCollider = GetComponent<SphereCollider>();
+                // ComputeProperties(meshFilter.mesh.vertices);
+                // isGenerated = true;
             } else
             {
                 Debug.LogWarning($"{this} can't generate cube collider from empty mesh!");
             }
         }
 
-        public override void GenerateCollider()
+        private void OnEnable()
         {
-            base.GenerateCollider();
-            if (!isGenerated)
-            {
-                Debug.Log($"GENERATING CUBE COLLIDER FROM <color=gray> {meshFilter.mesh.vertices.Length} </color> vertices!");
-                SphereCollider = GetComponent<SphereCollider>();
-                SphereCollider.GenerateCollider();
-                ComputeProperties(meshFilter.mesh.vertices);
-                isGenerated = true;
-                CollideManager.Instance.AddCollider(gameObject.GetComponent<Shape>());
-            }
+            SphereCollider = GetComponent<SphereCollider>();
+            // ComputeProperties(meshFilter.mesh.vertices);
+            isGenerated = true;
         }
 
         public override bool IsColliding(Collider other, out List<ContactPoint> contactPoints)
         {
             contactPoints = null;
+            if (SphereCollider != null) return false;
             switch (other)
             {
                 case SphereCollider sphereCollider:
@@ -66,6 +62,29 @@ namespace Shapes
                     return CollideManager.HalfPlaneVsObject(halfPlaneCollider.Plane, this, out contactPoints);
                 default:
                     return false;
+            }
+        }
+
+        public override void GenerateCollider()
+        {
+            base.GenerateCollider();
+            if (!isGenerated)
+            {
+                Debug.Log($"GENERATING CUBE COLLIDER FROM <color=gray> {meshFilter.mesh.vertices.Length} </color> vertices!");
+                // SphereCollider = GetComponent<SphereCollider>();
+                // SphereCollider.GenerateCollider();
+                ComputeProperties(meshFilter.mesh.vertices);
+                isGenerated = true;
+
+                // if (CollideManager.Instance != null)
+                // {
+                //     CollideManager.Instance.AddCollider(gameObject.GetComponent<Shape>());
+                // }
+                //
+                // if (GPUCollideManager.Instance != null)
+                // {
+                //     GPUCollideManager.Instance.AddCollider(gameObject.GetComponent<Shape>());
+                // }
             }
         }
 

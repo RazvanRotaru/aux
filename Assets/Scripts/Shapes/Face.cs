@@ -5,7 +5,6 @@ using UnityEngine;
 
 namespace Shapes
 {
-    [System.Serializable]
     public class Face : IDrawable
     {
         [SerializeField] private Vector3 normal;
@@ -23,6 +22,7 @@ namespace Shapes
         public Vector3 NormalLocal => normal;
 
         public Vector3 Center => HalfEdge.Transform.TransformPoint(center);
+        public Vector3 CenterLocal => center;
 
         public List<Vector3> Points => edges.Select(edge => edge.Vertex).ToList();
 

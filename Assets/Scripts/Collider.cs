@@ -1,5 +1,7 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using Collisions.GPU;
 using Shapes;
 using UnityEngine;
 using ContactPoint = Shapes.ContactPoint;
@@ -82,8 +84,28 @@ public abstract class Collider : MonoBehaviour, ICollidable
         ComputeInverseMass();
     }
 
+    protected virtual void OnEnable()
+    {
+        meshRenderer = GetComponent<MeshRenderer>();
+        meshFilter = GetComponent<MeshFilter>();
+        shape = GetComponent<Shape>();
+        red = shape.GetContactMaterial();
+        blue = shape.GetNormalMaterial();
+        yellow = shape.NearMaterial;
+        ComputeInverseMass();
+    }
+
     public virtual void GenerateCollider()
     {
+        if (CollideManager.Instance != null)
+        {
+            CollideManager.Instance.AddCollider(gameObject.GetComponent<Shape>());
+        }
+
+        if (GPUCollideManager.Instance != null)
+        {
+            GPUCollideManager.Instance.AddCollider(gameObject.GetComponent<Shape>());
+        }
         return;
     }
 

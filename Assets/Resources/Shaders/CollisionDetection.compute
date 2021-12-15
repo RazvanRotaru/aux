@@ -1,5 +1,7 @@
-﻿#pragma kernel CollisionDetection
+﻿#pragma kernel collision_detection
+#pragma kernel apply_transformations
 // #pragma kernel SphereVsSphere
+#pragma target 5.0
 
 #include "HalfEdge.hlsl"
 #include "Face.hlsl"
@@ -12,20 +14,56 @@
 #define EPS 1e-5
 
 
-int objectsNo;
+// #define FRONT 1
+// #define BACK -1
+// #define ON 0
 
-RWStructuredBuffer<uint2> halfedgeInfo;
-RWStructuredBuffer<uint2> faceInfo;
+int objects_no;
 
-RWStructuredBuffer<HalfEdge> halfedges;
-RWStructuredBuffer<Face> faces;
-RWStructuredBuffer<Shape> shapes;
-RWStructuredBuffer<float3> points;
-RWStructuredBuffer<TransformMat> mat;
+StructuredBuffer<HalfEdge> half_edges;
+StructuredBuffer<Face> faces;
+StructuredBuffer<Shape> shapes;
+StructuredBuffer<float3> points;
+StructuredBuffer<TransformMat> mat;
 
-RWStructuredBuffer<float2> collisions;
+RWStructuredBuffer<HalfEdge> world_half_edges;
+RWStructuredBuffer<Face> world_faces;
 
-float3 SupportPoint(const Shape shape, const float3 dir, const float4x4 r, const float3 t)
+RWStructuredBuffer<float4> collisions;
+
+float3 world_coords(const float3 v, const float4x4 r, const float3 t)
+{
+    return mul(r, float4(v, 1.0f)).xyz + t;
+}
+
+
+float3 world_dir(const float3 v, const float4x4 r)
+{
+    return mul(r, float4(v, 1.0f)).xyz;
+}
+
+HalfEdge world_coords(const HalfEdge he, const float4x4 r, const float3 t)
+{
+    HalfEdge ans;
+    ans.vertex = world_coords(he.vertex, r, t);
+    ans.local_vertex = he.local_vertex;
+    ans.edge = world_dir(he.edge, r);
+    ans.n1 = world_dir(he.n1, r);
+    ans.n2 = world_dir(he.n2, r);
+
+    return ans;
+}
+
+Face world_coords(const Face f, const float4x4 r, const float3 t)
+{
+    Face ans;
+    ans.center = world_coords(f.center, r, t);
+    ans.normal = world_dir(f.normal, r);
+
+    return ans;
+}
+
+float3 get_support_point(const Shape shape, const float3 dir, const float4x4 r, const float3 t)
 {
     const uint points_offset = shape.pointInfo[OFFSET];
     const uint points_num = shape.pointInfo[NUM];
@@ -35,7 +73,7 @@ float3 SupportPoint(const Shape shape, const float3 dir, const float4x4 r, const
 
     for (uint i = points_offset; i < points_offset + points_num; i++)
     {
-        const float3 vert = mul(r, float4(points[i], 1)).xyz;
+        const float3 vert = world_dir(points[i], r);
         const float projection = dot(vert, dir);
 
         if (projection > best_projection)
@@ -48,36 +86,36 @@ float3 SupportPoint(const Shape shape, const float3 dir, const float4x4 r, const
     return t + best_vert;
 }
 
-float QueryFace(const uint a_id, const uint b_id, out int face_id)
+float query_face(const uint a_id, const uint b_id, out int face_id)
 {
-    const uint faces_off = faceInfo[a_id][OFFSET];
-    const uint faces_num = faceInfo[a_id][NUM];
+    const uint faces_off = shapes[a_id].faceInfo[OFFSET];
+    const uint faces_num = shapes[a_id].faceInfo[NUM];
 
     const Shape shape = shapes[b_id];
-    const float4x4 R = mat[b_id].R;
-    const float3 T = mat[b_id].T;
+    const TransformMat b_mat = mat[b_id];
 
     float best_distance = -NA;
 
     for (uint i = faces_off; i < faces_off + faces_num; i++)
     {
-        const Face curr_face = faces[i];
-        const float3 support_point = SupportPoint(shape, -curr_face.normal, R, T);
+        const Face curr_face = world_faces[i];
+
+        const float3 support_point = get_support_point(shape, -curr_face.normal, b_mat.R, b_mat.T);
 
         const float distance = dot(curr_face.normal, support_point - curr_face.center);
 
         if (distance > best_distance)
         {
             best_distance = distance;
-            face_id = i;
+            face_id = i - faces_off;
         }
     }
 
     return best_distance;
 }
 
-bool IsMinkowskiFace(const float3 a, const float3 b, const float3 c, const float3 d, const float3 bxa,
-                     const float3 dxc)
+bool is_minkowski_face(const float3 a, const float3 b, const float3 c, const float3 d, const float3 bxa,
+                       const float3 dxc)
 {
     const float cba = dot(c, bxa);
     const float dba = dot(d, bxa);
@@ -87,12 +125,12 @@ bool IsMinkowskiFace(const float3 a, const float3 b, const float3 c, const float
     return (cba * dba < 0.0f) && (adc * bdc < 0.0f) && (cba * bdc > 0.0f);
 }
 
-bool BuildMinkowskiFace(const HalfEdge he_a, const HalfEdge he_b)
+bool build_minkowski_face(const HalfEdge he_a, const HalfEdge he_b)
 {
-    return IsMinkowskiFace(he_a.n1, he_a.n2, -he_b.n1, -he_b.n2, he_a.edge, he_b.edge);
+    return is_minkowski_face(he_a.n1, he_a.n2, -he_b.n1, -he_b.n2, he_a.edge, he_b.edge);
 }
 
-float Distance(const HalfEdge he_a, const HalfEdge he_b)
+float distance(const HalfEdge he_a, const HalfEdge he_b)
 {
     float3 n = cross(he_a.edge, he_b.edge);
     if (abs(length(n)) < EPS) return -NA;
@@ -103,119 +141,214 @@ float Distance(const HalfEdge he_a, const HalfEdge he_b)
     return dot(n, he_b.vertex - he_a.vertex);
 }
 
-float QueryEdge(uint a_id, uint b_id, out uint edgeA, out uint edgeB)
+float query_edge(const uint a_id, const uint b_id, out int edge_a, out int edge_b)
 {
-    const uint a_he_start = halfedgeInfo[a_id][OFFSET];
-    const uint a_he_end = a_he_start + halfedgeInfo[a_id][NUM];
-    const uint b_he_start = halfedgeInfo[b_id][OFFSET];
-    const uint b_he_end = b_he_start + halfedgeInfo[b_id][NUM];
+    const uint a_he_start = shapes[a_id].halfEdgeInfo[OFFSET];
+    const uint a_he_end = a_he_start + shapes[a_id].halfEdgeInfo[NUM];
+    const uint b_he_start = shapes[b_id].halfEdgeInfo[OFFSET];
+    const uint b_he_end = b_he_start + shapes[b_id].halfEdgeInfo[NUM];
 
+    float sth = 0;
     int count = 100;
-    for (uint i = a_he_start; i < a_he_end; i += 1)
+    for (uint i = a_he_start; i < a_he_end; i += 2)
     {
-        const HalfEdge he_a = halfedges[i];
+        const HalfEdge he_a = world_half_edges[i];
 
-        for (uint j = b_he_start; j < b_he_end; j += 1)
+        for (uint j = b_he_start; j < b_he_end; j += 2)
         {
-            const HalfEdge he_b = halfedges[j];
+            const HalfEdge he_b = world_half_edges[j];
             count += 1;
 
-            if (!BuildMinkowskiFace(he_a, he_b)) continue;
+            if (!build_minkowski_face(he_a, he_b)) continue;
 
-            const float separation = Distance(he_a, he_b);
+            const float separation = distance(he_a, he_b);
+            if (separation < sth)
+            {
+                sth = separation;
+            }
             if (separation > 0)
             {
-                edgeA = i;
-                edgeB = j;
+                edge_a = i - a_he_start;
+                edge_b = j - b_he_start;
                 return separation;
             }
         }
     }
 
-    edgeA = -1;
-    edgeB = -1;
-    return -count;
+    edge_a = -1;
+    edge_b = -1;
+    return -sth;
 }
 
-bool PolygonVsPolygon(const int id, const int other_id)
+#define EDGE_CASE 0
+#define FACE_CASE 1
+
+bool polygon_vs_polygon(const int id, const int other_id, out int case_id, out float2 pair)
 {
-    uint face_a = 0;
-    const float dist_ab = QueryFace(id, other_id, face_a);
+    int face_a;
+    const float dist_ab = query_face(id, other_id, face_a);
     if (dist_ab > 0.0f)
     {
         return false;
     }
 
-    uint face_b = 0;
-    const float dist_ba = QueryFace(other_id, id, face_b);
+    int face_b;
+    const float dist_ba = query_face(other_id, id, face_b);
     if (dist_ba > 0.0f)
     {
         return false;
     }
 
+    const float min_face_dist = min(abs(dist_ab), abs(dist_ba));
 
-    uint edge_a = 0, edge_b = 0;
-    const float dist_edge = QueryEdge(id, other_id, edge_a, edge_b);
+    int edge_a;
+    int edge_b;
+    float dist_edge = query_edge(id, other_id, edge_a, edge_b);
     if (dist_edge > 0.0f)
     {
         return false;
     }
 
+    dist_edge = abs(dist_edge);
+    if (dist_edge < min_face_dist)
+    {
+        case_id = EDGE_CASE;
+        pair = float2(edge_a, edge_b);
+    }
+    else
+    {
+        case_id = min_face_dist == abs(dist_ab) ? FACE_CASE : 10 + FACE_CASE;
+        pair = min_face_dist == abs(dist_ab) ? float2(face_a, min_face_dist) : float2(face_b, min_face_dist);
+    }
+
     return true;
 }
 
-bool SphereVsSphere(const int id, const int other_id)
+bool sphere_vs_sphere(const int id, const int other_id)
 {
-    Shape a = shapes[id];
-    Shape b = shapes[other_id];
+    const Shape a = shapes[id];
+    const Shape b = shapes[other_id];
 
     const float3 a_center = mat[id].T;
     const float3 b_center = mat[other_id].T;
     const float dist = distance(a_center, b_center);
     const float radii_sum = a.radius + b.radius;
 
-    float diff = dist - radii_sum;
+    const float diff = dist - radii_sum;
 
     const bool overlapping = diff <= 0.0f;
-
-    if (overlapping)
-    {
-        // TODO create contact point
-    }
-
-    if (! overlapping)
-    {
-        const int index = id * objectsNo + other_id;
-        collisions[index] = float2(-60 - id, diff);
-    }
 
     return overlapping;
 }
 
-
-[numthreads(32, 32, 1)]
-void CollisionDetection(uint3 gid: SV_DispatchThreadID)
+bool intersect(const float3 a, const float3 b, const Face plane)
 {
-    if (gid.x >= objectsNo || gid.y >= objectsNo)
+    const float3 ab = b - a;
+    const float d = dot(plane.normal, normalize(ab));
+
+    if (abs(d) < EPS) return false;
+
+    const float t = (dot(plane.normal, plane.center) - dot(plane.normal, a)) / d;
+
+    if (t < -EPS || t > 1.0f + EPS) return false;
+
+    return true;
+}
+
+bool plane_vs_sphere(const int id, const int other_id)
+{
+    const Face plane = world_faces[shapes[id].faceInfo[OFFSET]];
+    const float3 sphere_center = mat[other_id].T;
+    const float radius = shapes[other_id].radius;
+
+    const float3 dir = dot(plane.normal, normalize(plane.center - sphere_center)) * plane.normal;
+    const float3 p = sphere_center + radius * dir;
+
+    if (intersect(sphere_center, p, plane))
+    {
+        return true;
+    }
+
+    return false;
+}
+
+[numthreads(1024, 1, 1)]
+void apply_transformations(uint3 gid: SV_DispatchThreadID)
+{
+    collisions[gid.x] = float4(-99, -99, -99, -99);
+
+    if (gid.x >= objects_no)
     {
         return;
     }
     const int id = gid.x;
-    const int other_id = gid.y;
+    const TransformMat mtx = mat[id];
 
-    const int index = id * objectsNo + other_id;
-    collisions[index] = float2(-99, -99);
-
-    if (other_id == id || length(collisions[index]) <= 0) return;
-
-    if (!SphereVsSphere(id, other_id)) return;
-    if (shapes[id].isSphere == 1)
+    if (shapes[id].type != PLANE)
     {
-        collisions[index] = float2(id, -other_id);
-        return;
+        const uint he_start = shapes[id].halfEdgeInfo[OFFSET];
+        const uint he_end = he_start + shapes[id].halfEdgeInfo[NUM];
+
+        for (int i = he_start; i < he_end; i++)
+        {
+            world_half_edges[i] = world_coords(half_edges[i], mtx.R, mtx.T);
+        }
     }
 
-    if (!PolygonVsPolygon(id, other_id)) return;
 
-    collisions[index] = float2(id, other_id);
+    const uint faces_start = shapes[id].faceInfo[OFFSET];
+    const uint faces_end = faces_start + shapes[id].faceInfo[NUM];
+
+    for (int i = faces_start; i < faces_end; i++)
+    {
+        world_faces[i] = world_coords(faces[i], mtx.R, mtx.T);
+    }
+}
+
+#define POLYvPOLY 0
+#define SPHEREvSPHERE -1
+#define SPHEREvPLANE -2
+
+[numthreads(32, 32, 1)]
+void collision_detection(uint3 gid: SV_DispatchThreadID)
+{
+    if (gid.x >= objects_no || gid.y >= objects_no)
+        if (gid.x >= objects_no || gid.y >= objects_no)
+        {
+            return;
+        }
+    const int id = gid.x;
+    const int other_id = gid.y;
+    const int index = id * objects_no + other_id;
+    if (other_id == id || collisions[other_id][2] >= 0)
+    {
+        return;
+    }
+    
+    if (shapes[id].type == PLANE)
+    {
+        return;
+    }
+    if (shapes[other_id].type == PLANE)
+    {
+        if (!plane_vs_sphere(other_id, id)) return;
+        collisions[index] = float4(SPHEREvPLANE, other_id, shapes[id].type, 0);
+        return;
+    }
+    
+    if (!sphere_vs_sphere(id, other_id)) return;
+    if (shapes[id].type == SPHERE && shapes[other_id].type == SPHERE)
+    {
+        collisions[index] = float4(SPHEREvSPHERE, other_id, 0, 0);
+        return;
+    }
+    if (collisions[other_id][2] >= 0) return;
+    
+    collisions[index] = float4(-512.0f, -512.0f, -512.0f, -512.0f);
+    int case_id = 0;
+    float2 pair;
+    if (!polygon_vs_polygon(id, other_id, case_id, pair))
+    {
+    }
+    collisions[index] = float4(case_id, other_id, pair);
 }

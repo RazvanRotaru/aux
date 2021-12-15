@@ -11,13 +11,11 @@ public class CollideManager : MonoBehaviour
     private static bool _aux;
 
     public const float Eps = 1e-3f;
-    [SerializeField] private GameObject debugPoint;
     [SerializeField] private bool debugContactPoints;
     private Dictionary<(Collider, Collider), bool> collidingObjects = new Dictionary<(Collider, Collider), bool>();
 
 
     public static CollideManager Instance { get; private set; }
-    public GameObject DebugPoint => debugPoint;
 
     private void Awake()
     {
@@ -29,12 +27,6 @@ public class CollideManager : MonoBehaviour
 
         Instance = this;
         DontDestroyOnLoad(gameObject);
-    }
-
-    private void Reset()
-    {
-        debugPoint = Resources.Load("Prefabs/DebugPoint") as GameObject;
-        print(debugPoint);
     }
 
     public static bool HalfPlaneVsObject(Plane plane, PolygonCollider obj, out List<ContactPoint> contactPoints)
@@ -72,18 +64,9 @@ public class CollideManager : MonoBehaviour
         var OA = obj.Center - plane.Point;
         var OB = p - plane.Point;
 
-        // TODO: optimize or create specific method
         if (Intersect(obj.transform.position, p, plane,
             out var pos)) // Vector3.Dot(OA, plane.Normal) * Vector3.Dot(OB, plane.Normal) < 0f &&
         {
-            // Debug.Log($"{plane} collides with {obj}");
-            // plane.Draw(Color.green);
-            //
-            // var cp = Instantiate(Instance.DebugPoint, pos, Quaternion.identity);
-            // cp.GetComponent<MeshRenderer>().material.color = Color.blue;
-            // cp.transform.localScale *= 0.33f;
-            // Destroy(cp, 0.05f);
-
             contactPoints = new List<ContactPoint>
             {
                 new ContactPoint(pos, plane.Normal,
@@ -239,7 +222,7 @@ public class CollideManager : MonoBehaviour
         return (cba * dba < 0f) && (adc * bdc < 0f) && (cba * bdc > 0f);
     }
 
-    private static float Distance(HalfEdge halfEdgeA, HalfEdge halfEdgeB, PolygonCollider cubeA)
+    public static float Distance(HalfEdge halfEdgeA, HalfEdge halfEdgeB, PolygonCollider cubeA)
     {
         var edgeA = halfEdgeA.Edge;
         var pointA = halfEdgeA.Vertex;
@@ -350,34 +333,36 @@ public class CollideManager : MonoBehaviour
         var distance = x ? Mathf.Abs(faceQueryAb.distance) : Mathf.Abs(faceQueryBa.distance);
         if (Mathf.Abs(EdgeQuery.distance) < Mathf.Abs(distance))
         {
-            if (Intersect(EdgeQuery.a.Vertex, EdgeQuery.a.Twin.Vertex, EdgeQuery.b.Vertex, EdgeQuery.b.Twin.Vertex,
-                out var pos))
-            {
-                contactPoints.Add(new ContactPoint(pos, a.Center - pos, distance));
-            }
-
-            Debug.LogWarning("EDGE CASE");
+            // if (Intersect(EdgeQuery.a.Vertex, EdgeQuery.a.Twin.Vertex, EdgeQuery.b.Vertex, EdgeQuery.b.Twin.Vertex,
+            //     out var pos))
+            // {
+            //     contactPoints.Add(new ContactPoint(pos, a.Center - pos, distance));
+            // }
+            //
+            // Debug.LogWarning("EDGE CASE");
+            contactPoints.AddRange(EdgeVsEdge(a, EdgeQuery.a, EdgeQuery.b, EdgeQuery.distance));
         }
         else
         {
             var referenceFace = x ? faceQueryAb.face : faceQueryBa.face;
             var incidentFace = MostAntiParallelFace(x ? b : a, referenceFace);
 
-            referenceFace.Draw(Color.green);
-            incidentFace.Draw(Color.red);
-
-            Debug.Log($"<color=green>{(x ? a : b)} ref face: {referenceFace}</color>");
-            Debug.Log($"<color=red>{(x ? b : a)} inc face: {incidentFace}</color>");
-
-            foreach (var sidePlane in referenceFace.SidePlanes)
-            {
-                contactPoints.AddRange(GenerateContactPoints(sidePlane, incidentFace)
-                    .Where(p => Vector3.Dot(p - referenceFace.Center, referenceFace.Normal) <
-                        0f && Intersect(p, referenceFace)) //
-                    .Select(pos => new ContactPoint(pos, a.Center - pos, EdgeQuery.distance)));
-            }
-
-            Debug.LogWarning("FACE CASE");
+            // referenceFace.Draw(Color.green);
+            // incidentFace.Draw(Color.red);
+            //
+            // Debug.Log($"<color=green>{(x ? a : b)} ref face: {referenceFace}</color>");
+            // Debug.Log($"<color=red>{(x ? b : a)} inc face: {incidentFace}</color>");
+            //
+            // foreach (var sidePlane in referenceFace.SidePlanes)
+            // {
+            //     contactPoints.AddRange(GenerateContactPoints(sidePlane, incidentFace)
+            //         .Where(p => Vector3.Dot(p - referenceFace.Center, referenceFace.Normal) <
+            //             0f && Intersect(p, referenceFace)) //
+            //         .Select(pos => new ContactPoint(pos, a.Center - pos, distance)));
+            // }
+            //
+            // Debug.LogWarning("FACE CASE");
+            contactPoints.AddRange(FaceVFace(a, referenceFace, incidentFace, distance));
         }
 
         if (contactPoints.Count == 0)
@@ -386,6 +371,38 @@ public class CollideManager : MonoBehaviour
         }
 
         return true;
+    }
+
+    public static IEnumerable<ContactPoint> EdgeVsEdge(PolygonCollider c, HalfEdge a, HalfEdge b, float distance)
+    {
+        var contactPoints = new List<ContactPoint>();
+        if (Intersect(a.Vertex, a.Twin.Vertex, b.Vertex, b.Twin.Vertex,
+            out var pos))
+        {
+            contactPoints.Add(new ContactPoint(pos, c.Center - pos, distance));
+        }
+
+        Debug.LogWarning("EDGE CASE");
+        return contactPoints;
+    }
+
+    public static IEnumerable<ContactPoint> FaceVFace(PolygonCollider c, Face referenceFace, Face incidentFace,
+        float distance)
+    {
+        var contactPoints = new List<ContactPoint>();
+        referenceFace.Draw(Color.green);
+        incidentFace.Draw(Color.red);
+
+        foreach (var sidePlane in referenceFace.SidePlanes)
+        {
+            contactPoints.AddRange(GenerateContactPoints(sidePlane, incidentFace)
+                .Where(p => Vector3.Dot(p - referenceFace.Center, referenceFace.Normal) <
+                    0f && Intersect(p, referenceFace)) //
+                .Select(pos => new ContactPoint(pos, c.Center - pos, distance)));
+        }
+
+        Debug.LogWarning("FACE CASE");
+        return contactPoints;
     }
 
     #endregion
@@ -582,7 +599,7 @@ public class CollideManager : MonoBehaviour
         return points;
     }
 
-    static Face MostAntiParallelFace(PolygonCollider polygon, Face refFace)
+    public static Face MostAntiParallelFace(PolygonCollider polygon, Face refFace)
     {
         var faces = polygon.Shape.Faces;
         // Debug.Log($"number of faces for {polygon}: {faces.Count}");
@@ -644,10 +661,17 @@ public class CollideManager : MonoBehaviour
                 if (!a.IsColliding(b, out var contactPoints)) continue;
 
                 if (debugContactPoints && contactPoints != null)
-                isColliding = true;
- 
+                    isColliding = true;
+
                 collidingObjects.Add((a, b), true);
-                CollisionResolution.Instance.ResolveCollision(a, b, contactPoints);
+                if (a is HalfPlaneCollider)
+                {
+                    CollisionResolution.Instance.ResolveCollision(b, a, contactPoints);
+                }
+                else
+                {
+                    CollisionResolution.Instance.ResolveCollision(a, b, contactPoints);
+                }
 
                 if (debugContactPoints)
                 {
@@ -673,15 +697,18 @@ public class CollideManager : MonoBehaviour
     // TODO: first collider is a wall; workaround: add everything before the walls
     public void AddCollider(Shape shape)
     {
-        PolygonCollider p = shape.GetComponent<PolygonCollider>();
-        SphereCollider s = shape.GetComponent<SphereCollider>();
-
-        if (p != null)
+        if (shape is Sphere)
         {
+            SphereCollider s = shape.GetComponent<SphereCollider>();
+            if (s != null)
+            {
+                colliders.Insert(0, s);
+            }
+        }
+        else
+        {
+            PolygonCollider p = shape.GetComponent<PolygonCollider>();
             colliders.Insert(0, p);
-        } else if (s != null)
-        {
-            colliders.Insert(0, s);
         }
     }
 }

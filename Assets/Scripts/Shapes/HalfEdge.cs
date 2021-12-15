@@ -61,6 +61,7 @@ namespace Shapes
 
         public void Draw(Color color)
         {
+        
             // var cp = Object.Instantiate(CollideManager.Instance.DebugPoint, Vertex, Quaternion.identity);
             // cp.GetComponent<MeshRenderer>().material.color = color;
             // cp.transform.localScale *= 0.33f;

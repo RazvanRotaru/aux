@@ -16,6 +16,13 @@ public class HalfPlaneCollider : Collider
         plane = new Plane(Vector3.zero, Vector3.up, transform);
     }
 
+    protected override void OnEnable()
+    {
+        meshRenderer = GetComponent<MeshRenderer>();
+        meshFilter = GetComponent<MeshFilter>();
+        plane = new Plane(Vector3.zero, Vector3.up, transform);
+    }
+
     public override bool IsColliding(Collider other, out List<ContactPoint> contactPoints)
     {
         if (other is SphereCollider sphereCollider)

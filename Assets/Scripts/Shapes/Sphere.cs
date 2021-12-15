@@ -11,17 +11,24 @@ public class Sphere : Shape
         RequestMeshData();
     }
 
-    private void Start()
+    protected override void OnEnable()
     {
         Reset();
         SphereCollider collider = GetComponent<SphereCollider>();
 
-        if (collider != null)
+        // if (collider != null)
+        // {
+        //     collider.GenerateCollider();
+        // } else
+        // {
+        //     Debug.LogWarning("No Sphere collider attached to sphere object");
+        // }
+
+        if (collider == null)
         {
-            collider.GenerateCollider();
-        } else
-        {
-            Debug.LogWarning("No Sphere collider attached to sphere object");
+            collider = gameObject.AddComponent<SphereCollider>();
         }
+        
+        collider.GenerateCollider();
     }
 }

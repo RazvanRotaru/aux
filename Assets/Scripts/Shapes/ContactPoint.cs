@@ -17,7 +17,7 @@ namespace Shapes
 
         public void Draw(Color color)
         {
-            var cp = Object.Instantiate(CollideManager.Instance.DebugPoint, Point, Quaternion.identity);
+            var cp = Object.Instantiate(DebugManager.Instance.DebugPoint, Point, Quaternion.identity);
             cp.GetComponent<MeshRenderer>().material.color = color;
             Object.Destroy(cp, 0.05f);
         }

@@ -29,11 +29,12 @@ public class Shape : MonoBehaviour
 
     private int index = 0;
 
-    private void Awake()
+    protected virtual void OnEnable()
     {
         if (GetComponents<Collider>().Length == 0)
         {
-            gameObject.AddComponent<SphereCollider>();
+            gameObject.AddComponent<PolygonCollider>();
+            // gameObject.AddComponent<SphereCollider>();
         }
 
         index = 0;

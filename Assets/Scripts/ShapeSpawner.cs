@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Collisions.GPU;
 using UnityEngine;
 using UnityEngine.Serialization;
 
@@ -77,6 +78,7 @@ public class ShapeSpawner : MonoBehaviour
 
         Shape newShape = Instantiate(shapes[index], spawnPosition, Quaternion.Euler(Random.Range(0, 360), Random.Range(0, 360), Random.Range(0, 360)));
         newShape.transform.parent = shapeHolder.transform;
+        RegisterCollider(newShape);
     }
 
     void ComputeBoxCenter()
@@ -117,13 +119,13 @@ public class ShapeSpawner : MonoBehaviour
         switch (scenarioType)
         {
             case Scenario.LOW_NUMBER:
-                SpawnScene(100, 250, 250, 250);
+                SpawnScene(100, 250, 250, 0);
                 break;
             case Scenario.MEDIUM_NUMBER:
-                SpawnScene(250, 500, 500, 500);
+                SpawnScene(250, 500, 500, 0);
                 break;
             case Scenario.HIGH_NUMBER:
-                SpawnScene(500, 1000, 650, 650);
+                SpawnScene(500, 1000, 650, 0);
                 break;
             default:
                 break;
@@ -137,13 +139,11 @@ public class ShapeSpawner : MonoBehaviour
         remainingSpawns.Add(boxNo);
         remainingSpawns.Add(sphereNo);
         remainingSpawns.Add(cylNo);
-        remainingSpawns.Add(coneNo);
 
         List<int> spawnIndices = new List<int>();
         spawnIndices.Add(0);
         spawnIndices.Add(1);
         spawnIndices.Add(2);
-        spawnIndices.Add(3);
 
         while (!useTest && spawnIndices.Count > 0)
         {
@@ -158,8 +158,9 @@ public class ShapeSpawner : MonoBehaviour
 
             Vector3 spawnPosition = transform.position + new Vector3(Random.Range(-2.0f * xLength + 2.0f, 2.0f * xLength - 2.0f), Random.Range(2.0f, 2.0f * xLength - 2.0f), Random.Range(-2.0f * zLength + 2.0f, 2.0f * zLength - 2.0f));
 
-            Shape newShape = Instantiate(shapes[0], spawnPosition, Quaternion.Euler(Random.Range(0.0f, 360.0f), Random.Range(0.0f, 360.0f), Random.Range(0.0f, 360.0f)));
+            Shape newShape = Instantiate(shapes[index], spawnPosition, Quaternion.Euler(Random.Range(0.0f, 360.0f), Random.Range(0.0f, 360.0f), Random.Range(0.0f, 360.0f)));
             newShape.transform.parent = shapeHolder.transform;
+            RegisterCollider(newShape);
         }
 
         // TEST
@@ -171,7 +172,21 @@ public class ShapeSpawner : MonoBehaviour
 
                 Shape newShape = Instantiate(shapes[0], spawnPosition, Quaternion.Euler(Random.Range(0.0f, 360.0f), Random.Range(0.0f, 360.0f), Random.Range(0.0f, 360.0f)));
                 newShape.transform.parent = shapeHolder.transform;
+                RegisterCollider(newShape);
             }
         }
+    }
+
+    private static void RegisterCollider(Shape shape)
+    {
+        // if (CollideManager.Instance != null)
+        // {
+        //     CollideManager.Instance.AddCollider(shape);
+        // }
+        //
+        // if (GPUCollideManager.Instance != null)
+        // {
+        //     GPUCollideManager.Instance.AddCollider(shape);
+        // }
     }
 }

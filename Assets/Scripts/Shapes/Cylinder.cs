@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Shapes;
 using UnityEngine;
 
 public class Cylinder : Shape
@@ -16,5 +17,14 @@ public class Cylinder : Shape
     private void Start()
     {
         Reset();
+        PolygonCollider collider = GetComponent<PolygonCollider>();
+
+        if (collider != null)
+        {
+            collider.GenerateCollider();
+        } else
+        {
+            Debug.LogWarning("Could not get polygon collider in Cube!");
+        }
     }
 }
