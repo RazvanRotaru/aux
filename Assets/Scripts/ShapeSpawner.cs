@@ -26,6 +26,7 @@ public class ShapeSpawner : MonoBehaviour
     [SerializeField]private Scenario scenarioType;
     [SerializeField]private bool loadScenario = false;
     [SerializeField] private bool useTest = true;
+    [SerializeField] private bool useGPU = true;
 
     // Start is called before the first frame update
     private void Start()
@@ -43,6 +44,16 @@ public class ShapeSpawner : MonoBehaviour
         if (loadScenario)
         {
             LoadScenario();
+        }
+
+        gameObject.AddComponent<CollisionResolution>();
+        if (useGPU)
+        {
+            gameObject.AddComponent<GPUCollideManager>();
+        }
+        else
+        {
+            gameObject.AddComponent<CollideManager>();
         }
     }
 
@@ -166,11 +177,11 @@ public class ShapeSpawner : MonoBehaviour
         // TEST
         if (useTest)
         {
-            for (int i = 0; i < 10; i++)
+            for (int i = 0; i < 60; i++)
             {
                 Vector3 spawnPosition = transform.position + new Vector3(Random.Range(-2.0f * xLength + 2.0f, 2.0f * xLength - 2.0f), Random.Range(2.0f, 2.0f * xLength - 2.0f), Random.Range(-2.0f * zLength + 2.0f, 2.0f * zLength - 2.0f));
 
-                Shape newShape = Instantiate(shapes[0], spawnPosition, Quaternion.Euler(Random.Range(0.0f, 360.0f), Random.Range(0.0f, 360.0f), Random.Range(0.0f, 360.0f)));
+                Shape newShape = Instantiate(shapes[Random.Range(0,3)], spawnPosition, Quaternion.Euler(Random.Range(0.0f, 360.0f), Random.Range(0.0f, 360.0f), Random.Range(0.0f, 360.0f)));
                 newShape.transform.parent = shapeHolder.transform;
                 RegisterCollider(newShape);
             }

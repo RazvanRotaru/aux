@@ -630,7 +630,7 @@ public class CollideManager : MonoBehaviour
 
     private void Start()
     {
-        // colliders = new List<Collider>(FindObjectsOfType<PolygonCollider>());
+        colliders = new List<Collider>();
         var polygonColliders = FindObjectsOfType<PolygonCollider>();
         colliders.AddRange(polygonColliders);
 

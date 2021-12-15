@@ -39,7 +39,7 @@ namespace Shapes
             }
         }
 
-        private void OnEnable()
+        protected override void OnEnable()
         {
             SphereCollider = GetComponent<SphereCollider>();
             // ComputeProperties(meshFilter.mesh.vertices);

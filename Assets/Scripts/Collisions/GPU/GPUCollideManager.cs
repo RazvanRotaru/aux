@@ -62,7 +62,7 @@ namespace Collisions.GPU
             pointInfo = p;
             halfEdgeInfo = he;
             faceInfo = f;
-            radius = r;
+            radius = 1.1f;//r;
             type = s switch
             {
                 SphereCollider _ => 1,
@@ -105,7 +105,7 @@ namespace Collisions.GPU
         [SerializeField] private List<HalfPlaneCollider> planes;
 
         [SerializeField] private int numColliders;
-        
+
         [SerializeField] private ComputeShader detectionLogic;
 
         private Kernel _kDetect;
@@ -119,9 +119,10 @@ namespace Collisions.GPU
         private List<int> heOffsets = new List<int>();
 
         private Dictionary<(int, int), bool> alreadyCollided = new Dictionary<(int, int), bool>();
-        
-        
+
+
         public static GPUCollideManager Instance { get; private set; }
+
         private void Awake()
         {
             if (Instance != null && Instance != this)
@@ -132,34 +133,44 @@ namespace Collisions.GPU
 
             Instance = this;
             DontDestroyOnLoad(gameObject);
-            
+
             // kDetect = new Kernel(detectionLogic, "PolygonVsPolygon");
         }
-        
+
         private void Reset()
         {
-            // detectionLogic = Resources.Load<ComputeShader>("Shaders/CollisionDetection");
+            detectionLogic = Resources.Load<ComputeShader>("Shaders/CollisionDetection");
         }
 
         private void Start()
         {
+            Reset();
             detectionLogic = Resources.Load<ComputeShader>("Shaders/CollisionDetection");
             _kTransform = new Kernel(detectionLogic, "apply_transformations");
             _kDetect = new Kernel(detectionLogic, "collision_detection");
 
+            colliders = new List<Collider>();
             var polygonColliders = FindObjectsOfType<PolygonCollider>();
             colliders.AddRange(polygonColliders);
 
             var sphereColliders = FindObjectsOfType<SphereCollider>().Where(sphereCollider =>
-                polygonColliders.All(col => col.gameObject.GetInstanceID() != sphereCollider.gameObject.GetInstanceID()));
+                polygonColliders.All(col =>
+                    col.gameObject.GetInstanceID() != sphereCollider.gameObject.GetInstanceID()));
+            foreach (var sC in sphereColliders)
+            {
+                sC.gameObject.AddComponent<PolygonCollider>();
+            }
+
             colliders.AddRange(sphereColliders);
             numColliders = colliders.Count;
-            
+
+            planes = new List<HalfPlaneCollider>();
             planes.AddRange(FindObjectsOfType<HalfPlaneCollider>());
 
 
             CollisionResolution.Instance.SetColliders(colliders.Select(sC => sC as Collider).ToList());
             InitializeBuffers();
+
 
             colliders.AddRange(planes);
 
@@ -213,8 +224,8 @@ namespace Collisions.GPU
             }
 
             var len = colliders.Count;
-            
-            
+
+
             for (var i = 0; i < len; i++)
             {
                 for (var j = i + 1; j < len; j++)
@@ -247,6 +258,7 @@ namespace Collisions.GPU
                             {
                                 point.Draw(Color.yellow);
                             }
+
                             CollisionResolution.Instance.ResolveCollision(col, pC, contactPoints);
                         }
                     }
@@ -254,7 +266,9 @@ namespace Collisions.GPU
                     if ((int) (res[0]) == -1) // SphereVSphere
                     {
                         var sphereA = colliders[i] as SphereCollider;
+                        if (sphereA == null) sphereA = (colliders[i] as PolygonCollider).SphereCollider;
                         var sphereB = colliders[(int) (res[1])] as SphereCollider;
+                        if (sphereB == null) sphereB = (colliders[(int) (res[1])] as PolygonCollider).SphereCollider;
                         CollideManager.SphereVsSphere(sphereA, sphereB, out var contactPoints);
                         CollisionResolution.Instance.ResolveCollision(sphereA, sphereB, contactPoints);
                     }
@@ -319,7 +333,7 @@ namespace Collisions.GPU
                     }
                 }
             }
-            
+
             alreadyCollided.Clear();
 
             // TODO add physics on GPU
@@ -355,7 +369,7 @@ namespace Collisions.GPU
                     points.AddRange(s.Shape.MeshInfo.vertexPosition);
 
                     var pts = s.Shape.MeshInfo.vertexPosition.Length;
-                    shapesInfo.Add(new ShapeInfo(s.GetComponent<Collider>(), new Vector2Int(sC, pts),
+                    shapesInfo.Add(new ShapeInfo(s, new Vector2Int(sC, pts),
                         new Vector2Int(hC, halfEdges),
                         new Vector2Int(fC, faces), s.GetComponent<SphereCollider>().Radius));
                     sC += pts;
@@ -429,7 +443,7 @@ namespace Collisions.GPU
 
             // TODO reset _collisionsBuffer each frame
         }
-        
+
         public void AddCollider(Shape shape)
         {
             PolygonCollider p = shape.GetComponent<PolygonCollider>();

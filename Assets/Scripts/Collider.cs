@@ -97,16 +97,15 @@ public abstract class Collider : MonoBehaviour, ICollidable
 
     public virtual void GenerateCollider()
     {
-        if (CollideManager.Instance != null)
-        {
-            CollideManager.Instance.AddCollider(gameObject.GetComponent<Shape>());
-        }
-
-        if (GPUCollideManager.Instance != null)
-        {
-            GPUCollideManager.Instance.AddCollider(gameObject.GetComponent<Shape>());
-        }
-        return;
+        // if (CollideManager.Instance != null)
+        // {
+        //     CollideManager.Instance.AddCollider(gameObject.GetComponent<Shape>());
+        // }
+        //
+        // if (GPUCollideManager.Instance != null)
+        // {
+        //     GPUCollideManager.Instance.AddCollider(gameObject.GetComponent<Shape>());
+        // }
     }
 
     private void Update()

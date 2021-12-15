@@ -29,6 +29,13 @@ public class SphereCollider : Collider
         //Shape.HalfEdges.ForEach(he => Debug.Assert(he.Transform != null, "A halfedges transform reference is null"));
     }
 
+    protected override void OnEnable()
+    {
+        base.OnEnable();
+        // ComputeRadiusFromMesh(meshFilter.mesh.vertices);
+
+    }
+
     public override void GenerateCollider()
     {
         base.GenerateCollider();
